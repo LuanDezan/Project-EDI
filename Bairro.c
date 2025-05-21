@@ -1,6 +1,7 @@
 //TODO colocar o vetor de nome de bairros no arquivo de constantes
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 
 #define MAXHASH 20
 
@@ -10,7 +11,7 @@ typedef struct Bairro{
     struct Bairro *prox;
 }Bairro;
 
-/* Essa é uma alternativa, acredito que pior
+/* Essa Ã© uma alternativa, acredito que pior
 int hashBairro(Bairro *teste){
     int chave = teste->id;
 
@@ -37,29 +38,29 @@ void cadastrarBairro(int idNovo, char *nomeNovo, Bairro *tabela){
 
     Bairro *novo = malloc(sizeof(Bairro));
     if(novo == NULL){
-        printf("Erro de alocação na tabela Hash de Bairro\n");
+        printf("Erro de alocaÃ§Ã£o na tabela Hash de Bairro\n");
         return;
     }
 
     novo->id = idNovo;
-    novo->nomeDoBairro = nomeNovo;
-    novo->prox = NULL; // Até aqui se cria um novo bairro;
+    strcpy(novo->nomeDoBairro, nomeNovo);
+    novo->prox = NULL; // AtÃ© aqui se cria um novo bairro;
 
     chave = hashBairro(novo->id);
 
-    if(tabela[chave]->prox == NULL){
-        tabela[chave]->prox = novo;
+    if(tabela[chave].prox == NULL){
+        tabela[chave].prox = novo;
     }else{
-        novo->prox = tabela[chave]->prox;
-        tabela[chave]->prox = novo;
+        novo->prox = tabela[chave].prox;
+        tabela[chave].prox = novo;
     }
     //Insercao concluida
 }
 
-void removerBairro(Bairro *tabela, int idBairro){ //Essa função me gerou uma dúvida, a gente mantêm os bairros usados em algum lugar fora da tabela hash tbm?
+void removerBairro(Bairro *tabela, int idBairro){ //Essa funÃ§Ã£o me gerou uma dÃºvida, a gente mantÃªm os bairros usados em algum lugar fora da tabela hash tbm?
     int chave = hashBairro(idBairro); //Pq como eu teria o id do bairro para buscar ou remover da tabela? Usar um contados para cada struct?
 
-    Bairro *leitor = tabela[chave]->prox;
+    Bairro *leitor = tabela[chave].prox;
     Bairro *ant = NULL;
 
     while(leitor != NULL && leitor->id != idBairro){
@@ -68,14 +69,14 @@ void removerBairro(Bairro *tabela, int idBairro){ //Essa função me gerou uma dúv
     }
 
     if(leitor == NULL){
-        printf("Erro, Bairro nao encontrado na tabela hash\n");
+        printf("Erro, Bairro id %d nao encontrado na tabela hash\n", idBairro);
         return;
     }
 
     if(ant != NULL){
         ant->prox = leitor->prox;
     }else{
-        tabela[chave]->prox = NULL;
+        tabela[chave].prox = NULL;
     }
 
 
@@ -85,19 +86,20 @@ void removerBairro(Bairro *tabela, int idBairro){ //Essa função me gerou uma dúv
 void buscaBairro(Bairro *tabela, int idBairro){
     int chave = hashBairro(idBairro);
 
-    Bairro *leitor = tabela[chave]->prox;
+    Bairro *leitor = tabela[chave].prox;
 
     while(leitor != NULL && leitor->id != idBairro){
         leitor = leitor->prox;
     }
 
-    printf("Bairro: %s", leitor->nomeDoBairro);
+    printf("Bairro %d: %s\n",idBairro, leitor->nomeDoBairro);
 }
 
 void resetarTabelaBairro(Bairro *tabela){
     for(int i= 0; i<MAXHASH; i++){
-        while(tabela[i]->prox != NULL){
-            removerBairro(tabela, tabela[i]->id);
+        while(tabela[i].prox != NULL){
+            int idRemover = tabela[i].prox->id;
+            removerBairro(tabela, idRemover);
         }
     }
 }
