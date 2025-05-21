@@ -2,7 +2,7 @@
 
 #define CONSTANTE
 #define MAX 40
-#define HASH 20
+#define HASH_SIZE 20
 
 #endif // CONSTANTE
 
