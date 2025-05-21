@@ -4,4 +4,6 @@
 typedef struct policia{
     int localizacao, id;
     char nome[MAX];
+struct policia*prox;
+
 }policia;
