@@ -26,7 +26,7 @@ void cadastrarCidadao(char *CPFnovo, char *nomeNovo, char *emailNovo, int idNovo
 
     Cidadao *novo = malloc(sizeof(Cidadao));
     if(novo == NULL){
-        printf("Erro de alocação na tabela Hash de Cidadao\n");
+        printf("Erro de alocaÃ§Ã£o na tabela Hash de Cidadao\n");
         return;
     }
 
@@ -35,7 +35,7 @@ void cadastrarCidadao(char *CPFnovo, char *nomeNovo, char *emailNovo, int idNovo
     strcpy(novo->email, emailNovo);
     novo->idBairroDeResidencia = idEndereco;
     novo->id = idNovo;
-    novo->prox = NULL; // Até aqui se cria um novo Cidadao;
+    novo->prox = NULL; // AtÃ© aqui se cria um novo Cidadao;
 
     chave = hashCidadao(novo->id);
 
@@ -48,7 +48,7 @@ void cadastrarCidadao(char *CPFnovo, char *nomeNovo, char *emailNovo, int idNovo
     //Insercao concluida
 }
 
-void removerCidadao(Cidadao *tabela, int idCidadao){ //Essa função me gerou uma dúvida, a gente mantêm os Cidadaos usados em algum lugar fora da tabela hash tbm?
+void removerCidadao(Cidadao *tabela, int idCidadao){ //Essa funÃ§Ã£o me gerou uma dÃºvida, a gente mantÃªm os Cidadaos usados em algum lugar fora da tabela hash tbm?
     int chave = hashCidadao(idCidadao); //Pq como eu teria o id do Cidadao para buscar ou remover da tabela? Usar um contados para cada struct?
 
     Cidadao *leitor = tabela[chave].prox;
@@ -67,7 +67,7 @@ void removerCidadao(Cidadao *tabela, int idCidadao){ //Essa função me gerou uma 
     if(ant != NULL){
         ant->prox = leitor->prox;
     }else{
-        tabela[chave].prox = NULL;
+        tabela[chave].prox = leitor->prox;
     }
 
 
