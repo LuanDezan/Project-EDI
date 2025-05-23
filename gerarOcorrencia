@@ -12,6 +12,19 @@
 #include"..\policia\PoliciaComHash.c"
 #include"..\constantes\constantes.h"
 
+int minutosTotais = 720; // 12:00
+
+void formatarHorario(int minutos, char *destino) {
+    int horas = minutos / 60;
+    int mins = minutos % 60;
+    sprintf(destino, "%02d:%02d", horas, mins);
+}
+
+
+void enviarOcorrencia(Ocorrencia *oc) 
+{
+    filaAtendimento(oc);
+}
 
 
 void gerarOcorrencia(Bairro *tabelaHashBairro) 
