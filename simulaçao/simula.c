@@ -3,27 +3,19 @@
 #include <string.h>
 #include <time.h>
 
-
-
-//TODO colocar o vetor de nome de bairros no arquivo de constantes
 #define MAX 40
 #define HASH_SIZE 20
 #define MAXHASH 20
 #define HASH 20
 
+#include "..\constantes\constantes.h"
+#include "..\Cidadao\Cidadao.h"
+#include "..\SAMU\Samu.h"
+#include "..\bairro\Bairro.h"
+#include "..\hospital\HospitalComHash.h"
+#include "..\policia\PoliciaComHash.h"
 
-#include"..\constantes\constantes.h"
-#include"..\Cidadao\Cidadao.c"
-#include"..\SAMU\Samu.c"
-#include"..\bairro\Bairro.c"
-#include"..\hash\hash.c"
-#include"..\hospital\HospitalComHash.c"
-#include"..\policia\PoliciaComHash.c"
-#include"..\constantes\constantes.h"
-
-
-
-
+// struct que representa uma ocorrência com informações como id, horário, gravidade, tipo, bairro e ponteiro para a próxima
 typedef struct Ocorrencia {
     int id;
     char horario[6];
@@ -33,59 +25,91 @@ typedef struct Ocorrencia {
     struct Ocorrencia *prox;
 } Ocorrencia;
 
+// struct que representa o descritor da fila de ocorrências
+typedef struct {
+    Ocorrencia *inicio;
+    Ocorrencia *fim;
+    int tamanho;
+} DescritorFila;
 
+// inicializa o descritor da fila com valores nulos e tamanho zero
+void inicializarDescritorFila(DescritorFila *fila) {
+    fila->fim = NULL;
+    fila->inicio = NULL;
+    fila->tamanho = 0;
+}
 
+// variável global que representa os minutos totais desde 00:00, iniciando em 12:00 (720 minutos)
+int minutosTotais = 720;
 
-int minutosTotais = 720; // 12:00
-
+// formata os minutos totais em horário hh:mm e salva na string destino
 void formatarHorario(int minutos, char *destino) {
     int horas = minutos / 60;
     int mins = minutos % 60;
     sprintf(destino, "%02d:%02d", horas, mins);
 }
 
-Ocorrencia *inicioFila = NULL;
+// insere uma ocorrência na fila de atendimento de acordo com a gravidade
+void filaAtendimento(DescritorFila *fila, Ocorrencia *nova) {
+    if (!fila->inicio || nova->gravidade > fila->inicio->gravidade) {
+        // insere no início se a fila estiver vazia ou se a gravidade for maior
+        nova->prox = fila->inicio;
+        fila->inicio = nova;
 
-void filaAtendimento(Ocorrencia *nova) {
-    if (!inicioFila || nova->gravidade > inicioFila->gravidade) {
-        nova->prox = inicioFila;
-        inicioFila = nova;
-        return;
+        if (fila->tamanho == 0) {
+            fila->fim = nova;
+        }
+    } else {
+        // percorre a fila para encontrar o local correto
+        Ocorrencia *atual = fila->inicio;
+        while (atual->prox && nova->gravidade <= atual->prox->gravidade) {
+            atual = atual->prox;
+        }
+
+        // insere a nova ocorrência na posição correta
+        nova->prox = atual->prox;
+        atual->prox = nova;
+
+        // atualiza o ponteiro do fim da fila, se necessário
+        if (!nova->prox) {
+            fila->fim = nova;
+        }
     }
-    Ocorrencia *atual = inicioFila;
-    while (atual->prox && nova->gravidade <= atual->prox->gravidade) {
-        atual = atual->prox;
-    }
-    nova->prox = atual->prox;
-    atual->prox = nova;
+    fila->tamanho++;
 }
 
-void enviarOcorrencia(Ocorrencia *oc) {
-    filaAtendimento(oc);
+// envia uma ocorrência para a fila de atendimento
+void enviarOcorrencia(DescritorFila *fila, Ocorrencia *oc) {
+    filaAtendimento(fila, oc);
 }
 
-void gerarOcorrencia(Bairro *tabelaHashBairro) {
+// gera uma nova ocorrência aleatória e a adiciona na fila
+void gerarOcorrencia(DescritorFila *fila, Bairro *tabelaHashBairro) {
     Ocorrencia *nova = malloc(sizeof(Ocorrencia));
+
     if (!nova) {
-        printf("Erro de aloca��o na ocorr�ncia.\n");
+        printf("erro de alocação na ocorrência.\n");
         return;
     }
 
+    // gera dados aleatórios para a ocorrência
     nova->id = rand() % 10000;
     nova->gravidade = rand() % 5 + 1;
     nova->tipo = rand() % 5 + 1;
     formatarHorario(minutosTotais, nova->horario);
 
-int idBairroAleatorio = (rand() % 10) * 100;
+    // seleciona um bairro aleatório
+    int idBairroAleatorio = (rand() % 10) * 100;
     int chave = hashBairro(idBairroAleatorio);
     Bairro *b = tabelaHashBairro[chave].prox;
 
+    // procura o bairro com o id correspondente
     while (b && b->id != idBairroAleatorio) {
         b = b->prox;
     }
 
     if (!b) {
-        printf("Erro: bairro %d n�o encontrado. Ocorr�ncia cancelada.\n", idBairroAleatorio);
+        printf("erro: bairro %d não encontrado. ocorrência cancelada.\n", idBairroAleatorio);
         free(nova);
         return;
     }
@@ -93,25 +117,29 @@ int idBairroAleatorio = (rand() % 10) * 100;
     nova->bairro = b;
     nova->prox = NULL;
 
+    // define o tipo de emergência como texto
     char tipoTexto[20];
     if (nova->tipo == 1) {
-        strcpy(tipoTexto, "Hospital");
+        strcpy(tipoTexto, "hospital");
     } else if (nova->tipo == 2) {
-        strcpy(tipoTexto, "Pol�cia");
+        strcpy(tipoTexto, "polícia");
     } else if (nova->tipo == 3) {
-        strcpy(tipoTexto, "Bombeiro");
+        strcpy(tipoTexto, "bombeiro");
     } else if (nova->tipo == 4) {
-        strcpy(tipoTexto, "SAMU");
+        strcpy(tipoTexto, "samu");
     } else {
-        strcpy(tipoTexto, "Outro");
+        strcpy(tipoTexto, "outro");
     }
 
-    printf("Ocorr�ncia gerada:\n");
-    printf("ID: %d | Hor�rio: %s | Gravidade: %d | Tipo: %d (%s) | Bairro: %s\n",
+    // imprime os dados da ocorrência
+    printf("ocorrência gerada:\n");
+    printf("id: %d | horário: %s | gravidade: %d | tipo: %d (%s) | bairro: %s\n", 
            nova->id, nova->horario, nova->gravidade, nova->tipo, tipoTexto, b->nomeDoBairro);
 
-    enviarOcorrencia(nova);
+    // envia a ocorrência para a fila
+    enviarOcorrencia(fila, nova);
 
+    // atualiza o horário com base na gravidade da ocorrência
     if (nova->gravidade == 1) {
         minutosTotais += rand() % 4 + 5;
     } else if (nova->gravidade == 2) {
@@ -125,26 +153,44 @@ int idBairroAleatorio = (rand() % 10) * 100;
     }
 }
 
-void mostrarFila() {
-    Ocorrencia *temp = inicioFila;
-    printf("\n--- FILA DE ATENDIMENTO ---\n");
+// mostra todas as ocorrências presentes na fila
+void mostrarFila(DescritorFila *fila) {
+    Ocorrencia *temp = fila->inicio;
+
+    printf("\n--- fila de atendimento (%d ocorrência(s)) ---\n", fila->tamanho);
+
     while (temp) {
         char tipoTexto[20];
+
         if (temp->tipo == 1) {
-            strcpy(tipoTexto, "Hospital");
+            strcpy(tipoTexto, "hospital");
         } else if (temp->tipo == 2) {
-            strcpy(tipoTexto, "Pol�cia");
+            strcpy(tipoTexto, "polícia");
         } else if (temp->tipo == 3) {
-            strcpy(tipoTexto, "Bombeiro");
+            strcpy(tipoTexto, "bombeiro");
         } else if (temp->tipo == 4) {
-            strcpy(tipoTexto, "SAMU");
+            strcpy(tipoTexto, "samu");
         } else {
-            strcpy(tipoTexto, "Outro");
+            strcpy(tipoTexto, "outro");
         }
 
-        printf("ID: %d | Hor�rio: %s | Gravidade: %d | Tipo: %d (%s) | Bairro: %s\n",
+        printf("id: %d | horário: %s | gravidade: %d | tipo: %d (%s) | bairro: %s\n", 
                temp->id, temp->horario, temp->gravidade, temp->tipo, tipoTexto, temp->bairro->nomeDoBairro);
         temp = temp->prox;
     }
 }
 
+// libera a memória alocada para a fila
+void limparFila(DescritorFila *fila) {
+    Ocorrencia *atual = fila->inicio;
+
+    while (atual) {
+        Ocorrencia *prox = atual->prox;
+        free(atual);
+        atual = prox;
+    }
+
+    fila->inicio = NULL;
+    fila->fim = NULL;
+    fila->tamanho = 0;
+}
