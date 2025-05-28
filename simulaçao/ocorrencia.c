@@ -4,7 +4,8 @@
 #include <time.h>
 
 
-typedef struct Ocorrencia
+// struct que representa uma ocorrência com informações como id, horário, gravidade, tipo, bairro e ponteiro para a próxima
+typedef struct Ocorrencia 
 {
     int id;
     char horario[6];
@@ -12,6 +13,7 @@ typedef struct Ocorrencia
     int tipo;
     struct Bairro *bairro;
     struct Ocorrencia *prox;
+
 } Ocorrencia;
 
 
