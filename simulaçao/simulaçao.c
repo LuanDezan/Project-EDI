@@ -16,7 +16,7 @@
 #include"..\hash\hash.c"
 #include"..\hospital\HospitalComHash.c"
 #include"..\policia\PoliciaComHash.c"
-#include"..\constantes\constantes.h"
+#include".\ocorrencia.c"
 
 
 typedef struct 
