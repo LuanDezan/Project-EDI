@@ -22,24 +22,32 @@
 #include"..\constantes\constantes.h"
 
 
-int main() {
+int main()
+{
+    DescritorFila fila;
+    inicializarDescritorFila(&fila);
+
     srand(time(NULL));
 
     Bairro tabelaHashBairro[MAXHASH];
     inicializarTabelaBairro(tabelaHashBairro);
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         int id = i * 100;
         char nome[30];
-        sprintf(nome, "Bairro%d", i);
+        sprintf(nome, "Bairro %d", i);
         cadastrarBairro(id, nome, tabelaHashBairro);
     }
 
-    for (int i = 0; i < 5; i++) {
-        gerarOcorrencia(tabelaHashBairro);
+
+    for (int i = 0; i < 5; i++)
+    {
+        gerarOcorrencia(&fila, tabelaHashBairro);
     }
 
-    mostrarFila();
+    mostrarFila(&fila);
     return 0;
 }
+
 
