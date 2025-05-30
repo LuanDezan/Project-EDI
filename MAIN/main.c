@@ -32,6 +32,7 @@ int main()
     Bairro tabelaHashBairro[MAXHASH];
     inicializarTabelaBairro(tabelaHashBairro);
 
+
     for (int i = 0; i < 10; i++)
     {
         int id = i * 100;
@@ -39,6 +40,7 @@ int main()
         sprintf(nome, "Bairro %d", i);
         cadastrarBairro(id, nome, tabelaHashBairro);
     }
+
 
 
     for (int i = 0; i < 5; i++)
@@ -49,5 +51,6 @@ int main()
     mostrarFila(&fila);
     return 0;
 }
+
 
 
