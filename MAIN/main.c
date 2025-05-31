@@ -3,54 +3,104 @@
 #include <string.h>
 #include <time.h>
 
-
-
-//TODO colocar o vetor de nome de bairros no arquivo de constantes
 #define MAX 40
-#define HASH_SIZE 20
 #define MAXHASH 20
-#define HASH 20
+#define NUM_BAIRROS 4
+#define NUM_SERVICOS 4
 
 
-#include"..\constantes\constantes.h"
-#include"..\Cidadao\Cidadao.c"
-#include"..\SAMU\Samu.c"
-#include"..\bairro\Bairro.c"
-#include"..\MAIN\main.c"
-#include"..\hospital\HospitalComHash.c"
-#include"..\policia\PoliciaComHash.c"
-#include"..\constantes\constantes.h"
+
+// estruturas
+
+typedef struct Bairro
+{
+    int id;
+    char nomeDoBairro[30];
+    struct Bairro *prox;
+} Bairro;
+
+typedef struct Ocorrencia
+{
+    int id;
+    char horarioChegada[6];
+    char horarioAtendimento[6];
+    int gravidade;
+    int tipo;
+    Bairro *bairro;
+    struct Ocorrencia *prox;
+} Ocorrencia;
+
+typedef struct
+{
+    Ocorrencia *inicio;
+    Ocorrencia *fim;
+    int tamanho;
+} DescritorFila;
 
 
 int main()
 {
-    DescritorFila fila;
-    inicializarDescritorFila(&fila);
-
     srand(time(NULL));
 
     Bairro tabelaHashBairro[MAXHASH];
-    inicializarTabelaBairro(tabelaHashBairro);
+    for (int i = 0; i < MAXHASH; i++) tabelaHashBairro[i].prox = NULL;
 
+    const char *NOMES_BAIRRO[NUM_BAIRROS] = {"Centro", "Norte", "Sul", "Leste"};
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < NUM_BAIRROS; i++)
     {
-        int id = i * 100;
-        char nome[30];
-        sprintf(nome, "Bairro %d", i);
-        cadastrarBairro(id, nome, tabelaHashBairro);
+        cadastrarBairro(i + 1, NOMES_BAIRRO[i], tabelaHashBairro);
     }
 
 
 
-    for (int i = 0; i < 5; i++)
+    DescritorFila *filas[NUM_SERVICOS];
+    for (int i = 0; i < NUM_SERVICOS; i++)
     {
-        gerarOcorrencia(&fila, tabelaHashBairro);
+        filas[i] = malloc(sizeof(DescritorFila));
+        inicializarDescritorFila(filas[i]);
     }
 
-    mostrarFila(&fila);
-    return 0;
+
+
+    for (int i = 0; i < 16; i++)
+    {
+        Ocorrencia *nova = criarOcorrenciaAleatoria(tabelaHashBairro);
+
+        if (nova)
+        {
+            enviarOcorrencia(filas, nova);
+        }
+
+    }
+
+    const char *TIPOS_SERVICO[NUM_SERVICOS] = {"HOSPITAL", "POLICIA", "BOMBEIRO", "SAMU"};
+
+    printf("\n============== ESTADO INICIAL DAS FILAS ==============\n");
+    for (int i = 0; i < NUM_SERVICOS; i++)
+    {
+        mostrarFilaAtual(filas[i], TIPOS_SERVICO[i]);
+    }
+
+
+    int tempoRestante[NUM_SERVICOS] = {0}; // inicia tudo zerado
+    Ocorrencia *emAtendimento[NUM_SERVICOS] = {NULL}; // controle externo da funcao
+
+    for (int i = 0; i < 20; i++)
+    {
+           processarFilas(filas, tempoRestante, tabelaHashBairro, emAtendimento);
+    }
+
+        printf("\n\n============== ESTADO FINAL DAS FILAS ==============\n");
+        for (int i = 0; i < NUM_SERVICOS; i++)
+        {
+            mostrarFilaAtual(filas[i], TIPOS_SERVICO[i]);
+
+        }
+
+        return 0;
 }
+
 
 
 
