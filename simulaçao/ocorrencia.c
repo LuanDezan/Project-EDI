@@ -5,15 +5,16 @@
 
 
 // struct que representa uma ocorrência com informações como id, horário, gravidade, tipo, bairro e ponteiro para a próxima
-typedef struct Ocorrencia 
+typedef struct Ocorrencia
 {
     int id;
-    char horario[6];
+    char horarioChegada[6];
+    char horarioAtendimento[6];
     int gravidade;
     int tipo;
-    struct Bairro *bairro;
+    Bairro *bairro;
     struct Ocorrencia *prox;
-
 } Ocorrencia;
+
 
 
