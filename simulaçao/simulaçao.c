@@ -82,7 +82,9 @@ void filaAtendimento(DescritorFila *fila, Ocorrencia *nova)
         {
             fila->fim = nova;
         }
-
+        
+    fila->tamanho++;
+        
     } else {
         // procura a poscao certa para colocar pela ordem da gravidade
         Ocorrencia *atual = fila->inicio;
@@ -101,10 +103,8 @@ void filaAtendimento(DescritorFila *fila, Ocorrencia *nova)
             fila->fim = nova;
         }
 
+        fila->tamanho++;
     }
-
-        // aumenra tamanho da fila
-    fila->tamanho++;
 
 }
 
