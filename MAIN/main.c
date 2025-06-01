@@ -86,10 +86,7 @@ int main()
     int tempoRestante[NUM_SERVICOS] = {0}; // inicia tudo zerado
     Ocorrencia *emAtendimento[NUM_SERVICOS] = {NULL}; // controle externo da funcao
 
-    for (int i = 0; i < 20; i++)
-    {
-           processarFilas(filas, tempoRestante, tabelaHashBairro, emAtendimento);
-    }
+    processarFilas(filas, tempoRestante, tabelaHashBairro, emAtendimento);
 
         printf("\n\n============== ESTADO FINAL DAS FILAS ==============\n");
         for (int i = 0; i < NUM_SERVICOS; i++)
