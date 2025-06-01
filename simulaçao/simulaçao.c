@@ -380,4 +380,3 @@ void mostrarFilaAtual(DescritorFila *fila, const char *nomeFila)
     printf("total: %d ocorrencias\n", cont);
 
 }
-

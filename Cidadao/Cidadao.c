@@ -1,3 +1,6 @@
+#include <stdio.h>
+#define MAXHASH 20
+
 typedef struct Cidadao{
     char CPF[14],
         nomeCidadao[35],

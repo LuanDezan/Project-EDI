@@ -3,6 +3,9 @@
 #include<string.h>
 #include"../bombeiro/bombeiro.c"
 #include"../constantes/constantes.h"
+#define HASH 30
+
+
 
 // Função de hash simples para distribuir os IDs nas posições da tabela hash
 int hash(int id){
@@ -102,11 +105,11 @@ void resetarTabelaBombeiro(bombeiros *tabela){
 }
 
 // Função de cadastro de policial (a ser implementada futuramente)
-void cadastrarPolicia(){
+//void cadastrarPolicia(){
 
-}
+//}
 
 // Função de cadastro de hospital (a ser implementada futuramente)
-void cadastrarHospital(){
+//void cadastrarHospital(){
 
-}
+//}

@@ -1,0 +1,123 @@
+# depslib dependency file v1.0
+1748616370 source:d:\mandartudolinux\ed1\project-edi\bairro\bairro.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1748616370 source:d:\mandartudolinux\ed1\project-edi\bombeiro\bombeiro.c
+	<stdio.h>
+	"..\constantes\constantes.h"
+
+1748616370 d:\mandartudolinux\ed1\project-edi\constantes\constantes.h
+
+1748620238 source:d:\mandartudolinux\ed1\project-edi\hash\hash.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../bombeiro/bombeiro.c"
+	"../constantes/constantes.h"
+
+1748616370 d:\mandartudolinux\ed1\project-edi\bombeiro\bombeiro.c
+	<stdio.h>
+	"..\constantes\constantes.h"
+
+1748616370 source:d:\mandartudolinux\ed1\project-edi\hospital\hospital.c
+	<stdio.h>
+	"..\constantes\constantes.h"
+
+1584205420 source:d:\mandartudolinux\ed1\project-edi\main.c
+	<stdio.h>
+	<stdlib.h>
+
+1748616370 source:d:\mandartudolinux\ed1\project-edi\policia\policia.c
+	<stdio.h>
+	"..\constantes\constantes.h"
+
+1748625381 source:d:\mandartudolinux\ed1\project-edi\hospital\hospitalcomhash.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1748616370 source:d:\mandartudolinux\ed1\project-edi\samu\samu.c
+	<stdio.h>
+	<stdlib.h>
+
+1748625416 source:d:\mandartudolinux\ed1\project-edi\policia\policiacomhash.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1748616370 source:d:\mandartudolinux\ed1\project-edi\simulaçao\ocorrencia.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+
+1748625432 source:d:\mandartudolinux\ed1\project-edi\cidadao\cidadao.c
+	<stdio.h>
+
+1748712742 source:d:\mandartudolinux\ed1\project-edi\simulaçao\simulaçao.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+
+1748625432 d:\mandartudolinux\ed1\project-edi\cidadao\cidadao.c
+	<stdio.h>
+
+1748616370 d:\mandartudolinux\ed1\project-edi\samu\samu.c
+	<stdio.h>
+	<stdlib.h>
+
+1748616370 d:\mandartudolinux\ed1\project-edi\bairro\bairro.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1748620238 d:\mandartudolinux\ed1\project-edi\hash\hash.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../bombeiro/bombeiro.c"
+	"../constantes/constantes.h"
+
+1748625381 d:\mandartudolinux\ed1\project-edi\hospital\hospitalcomhash.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1748625416 d:\mandartudolinux\ed1\project-edi\policia\policiacomhash.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1748616370 d:\mandartudolinux\ed1\project-edi\simulaçao\ocorrencia.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+
+1748712363 source:d:\mandartudolinux\ed1\project-edi\main\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+
+1748704199 source:d:\mandartudolinux\ed1\project-edi\main\main - copia.c
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<locale.h>
+	"..\constantes\constantes.h"
+
+1748704046 source:d:\mandartudolinux\ed1\project-edi\simulaçao\simula.c
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"..\constantes\constantes.h"
+
+1748704188 source:d:\mandartudolinux\ed1\project-edi\simulaçao\simulaçao - copia.c
+	<string.h>
+	<time.h>
+	"..\constantes\constantes.h"
+

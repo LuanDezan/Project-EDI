@@ -3,6 +3,7 @@
 #include<string.h>
 
 #define MAX 30
+#define MAXHASH 20
 
 typedef struct policia{
     char nome[MAX];

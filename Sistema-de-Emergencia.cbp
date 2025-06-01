@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Sistema-de-Emergencia" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Sistema-de-Emergencia" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Sistema-de-Emergencia" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Cidadao/Cidadao.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MAIN/main - Copia.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="MAIN/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SAMU/Samu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bairro/Bairro.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bombeiro/bombeiro.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="constantes/constantes.h" />
+		<Unit filename="hash/hash.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="hospital/HospitalComHash.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="hospital/hospital.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="policia/PoliciaComHash.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="policia/policia.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="simulaçao/ocorrencia.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="simulaçao/simula.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="simulaçao/simulaçao - Copia.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="simulaçao/simulaçao.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
