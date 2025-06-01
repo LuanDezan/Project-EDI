@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1748616370 source:d:\mandartudolinux\ed1\project-edi\bairro\bairro.c
+1748803049 source:d:\mandartudolinux\ed1\project-edi\bairro\bairro.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -47,16 +47,17 @@
 	<stdlib.h>
 	<string.h>
 
-1748739720 source:d:\mandartudolinux\ed1\project-edi\simulaçao\ocorrencia.c
+1748794615 source:d:\mandartudolinux\ed1\project-edi\simulaçao\ocorrencia.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<time.h>
+	"../bairro/Bairro.h"
 
 1748739720 source:d:\mandartudolinux\ed1\project-edi\cidadao\cidadao.c
 	<stdio.h>
 
-1748792929 source:d:\mandartudolinux\ed1\project-edi\simulaçao\simulaçao.c
+1748807201 source:d:\mandartudolinux\ed1\project-edi\simulaçao\simulaçao.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -120,4 +121,6 @@
 	<string.h>
 	<time.h>
 	"..\constantes\constantes.h"
+
+1748794615 d:\mandartudolinux\ed1\project-edi\bairro\bairro.h
 

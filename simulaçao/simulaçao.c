@@ -82,9 +82,9 @@ void filaAtendimento(DescritorFila *fila, Ocorrencia *nova)
         {
             fila->fim = nova;
         }
-        
+
     fila->tamanho++;
-        
+
     } else {
         // procura a poscao certa para colocar pela ordem da gravidade
         Ocorrencia *atual = fila->inicio;
@@ -110,9 +110,8 @@ void filaAtendimento(DescritorFila *fila, Ocorrencia *nova)
 
     }
 
-     // aumenra tamanho da fila
-    fila->tamanho++;
-}
+
+
 
 
 // envia a ocorrencia para a fila do serviço dela (tipo - 1 p indice, so tipo da errado)
@@ -175,176 +174,210 @@ Ocorrencia *criarOcorrenciaAleatoria(Bairro *tabelaHashBairro)
 
 void processarFilas(DescritorFila *filas[], int tempoRestante[], Bairro *tabelaHashBairro, Ocorrencia *emAtendimento[])
 {
-    int tempoFinal = 18 * 60;
+        int tempoFinal = 18 * 60;
 
-    if (tempoGlobal < 720)
-    {
-        tempoGlobal = 720;
-    }
-
-    while (tempoGlobal < tempoFinal)
-    {
-        printf("\n\n================= novo ciclo de atendimento =================\n");
-
-        char horarioAtual[6];
-        formatarHorario(tempoGlobal, horarioAtual);
-
-        const char *TIPOS_SERVICO[NUM_SERVICOS] = {"hospital", "policia", "bombeiro", "samu"};
-        const int TEMPOS_ATENDIMENTO[NUM_SERVICOS] = {20, 10, 8, 15};
-
-        int novasOcorrencias = 1 + rand() % 3;
-
-        printf("\n--> novas ocorrencias geradas neste ciclo: %d\n", novasOcorrencias);
-
-        for (int i = 0; i < novasOcorrencias; i++)
+        if (tempoGlobal < 720)
         {
-            Ocorrencia *nova = criarOcorrenciaAleatoria(tabelaHashBairro);
-
-            if (nova)
-            {
-                //formatarHorario(tempoGlobal, nova->horarioChegada);
-                enviarOcorrencia(filas, nova);
-
-                const char *TIPOS_SERVICO[NUM_SERVICOS] = {"hospital", "policia", "bombeiro", "samu"};
-
-                printf("  -> id: %04d | tipo: %s | gravidade: %d | bairro: %s | chegada: %s\n",
-                       nova->id,
-                       TIPOS_SERVICO[nova->tipo - 1],
-                       nova->gravidade,
-                       nova->bairro->nomeDoBairro,
-                       nova->horarioChegada);
-            }
+            tempoGlobal = 720;
         }
 
-        int sistemaVazio = 1;
-
-        for (int i = 0; i < NUM_SERVICOS; i++)
+        while (tempoGlobal < tempoFinal)
         {
-            printf("\n %-10s| hora: %s\n", TIPOS_SERVICO[i], horarioAtual);
+            printf("\n\n================= novo ciclo de atendimento =================\n");
 
-            if (emAtendimento[i] == NULL && filas[i]->inicio != NULL)
+            char horarioAtual[6];
+            formatarHorario(tempoGlobal, horarioAtual);
+
+            const char *TIPOS_SERVICO[NUM_SERVICOS] = {"hospital", "policia", "bombeiro", "samu"};
+            const int TEMPOS_ATENDIMENTO[NUM_SERVICOS] = {20, 10, 8, 15};
+
+            int novasOcorrencias = 1 + rand() % 3;
+
+            printf("\n--> novas ocorrencias geradas neste ciclo: %d\n", novasOcorrencias);
+
+            for (int i = 0; i < novasOcorrencias; i++)
             {
-                emAtendimento[i] = filas[i]->inicio;
-                filas[i]->inicio = filas[i]->inicio->prox;
-                tempoRestante[i] = TEMPOS_ATENDIMENTO[i];
-                strcpy(emAtendimento[i]->horarioAtendimento, horarioAtual);
-                filas[i]->tamanho--;
+                Ocorrencia *nova = criarOcorrenciaAleatoria(tabelaHashBairro);
+
+                if (nova)
+                {
+                    //formatarHorario(tempoGlobal, nova->horarioChegada);
+                    enviarOcorrencia(filas, nova);
+
+                    const char *TIPOS_SERVICO[NUM_SERVICOS] = {"hospital", "policia", "bombeiro", "samu"};
+
+                    printf("  -> id: %04d | tipo: %s | gravidade: %d | bairro: %s | chegada: %s\n",
+                           nova->id,
+                           TIPOS_SERVICO[nova->tipo - 1],
+                           nova->gravidade,
+                           nova->bairro->nomeDoBairro,
+                           nova->horarioChegada);
+                }
             }
 
-            if (emAtendimento[i])
+            int sistemaVazio = 1;
+
+            for (int i = 0; i < NUM_SERVICOS; i++)
             {
-                tempoRestante[i] -= TEMPO_TICK;
+                printf("\n %-10s| hora: %s\n", TIPOS_SERVICO[i], horarioAtual);
 
-                int hC, mC, hA, mA;
-                sscanf(emAtendimento[i]->horarioChegada, "%2d:%2d", &hC, &mC);
-                sscanf(emAtendimento[i]->horarioAtendimento, "%2d:%2d", &hA, &mA);
-                int espera = (hA * 60 + mA) - (hC * 60 + mC);
-
-                printf("  -> id: %04d\n     gravidade: %d\n     bairro: %s\n     chegada: %s\n     espera: %d min\n",
-                       emAtendimento[i]->id,
-                       emAtendimento[i]->gravidade,
-                       emAtendimento[i]->bairro->nomeDoBairro,
-                       emAtendimento[i]->horarioChegada,
-                       espera);
-
-                if (tempoRestante[i] <= 0)
+                if (emAtendimento[i] == NULL && filas[i]->inicio != NULL)
                 {
-                    char horarioTermino[6];
-                    formatarHorario(tempoGlobal, horarioTermino);
+                    emAtendimento[i] = filas[i]->inicio;
+                    filas[i]->inicio = filas[i]->inicio->prox;
+                    tempoRestante[i] = TEMPOS_ATENDIMENTO[i];
+                    strcpy(emAtendimento[i]->horarioAtendimento, horarioAtual);
+                    filas[i]->tamanho--;
+                }
 
-                    printf("     atendimento concluido\n");
-                    printf("     -----------------------------------\n");
-                    printf(">> atendimento encerrado para ocorrencia %04d | bairro: %s |as %s\n",
+                if (emAtendimento[i])
+                {
+                    tempoRestante[i] -= TEMPO_TICK;
+
+                    int hC, mC, hA, mA;
+                    sscanf(emAtendimento[i]->horarioChegada, "%2d:%2d", &hC, &mC);
+                    sscanf(emAtendimento[i]->horarioAtendimento, "%2d:%2d", &hA, &mA);
+                    int espera = (hA * 60 + mA) - (hC * 60 + mC);
+
+                    printf("  -> id: %04d\n     gravidade: %d\n     bairro: %s\n     chegada: %s\n     espera: %d min\n",
                            emAtendimento[i]->id,
+                           emAtendimento[i]->gravidade,
                            emAtendimento[i]->bairro->nomeDoBairro,
-                           horarioTermino);
+                           emAtendimento[i]->horarioChegada,
+                           espera);
 
-                    free(emAtendimento[i]);
-                    emAtendimento[i] = NULL;
-                }
-                else
-                {
-                    printf("     em atendimento... restante: %d min\n", tempoRestante[i]);
-                    printf("     -----------------------------------\n");
-                }
+                    if (tempoRestante[i] <= 0)
+                    {
+                        char horarioTermino[6];
+                        formatarHorario(tempoGlobal, horarioTermino);
 
-                sistemaVazio = 0;
-            }
-            else
-            {
-                if (filas[i]->tamanho > 0)
-                {
+                        printf("     atendimento concluido\n");
+                        printf("     -----------------------------------\n");
+                        printf(">> atendimento encerrado para ocorrencia %04d | bairro: %s |as %s\n\n",
+                               emAtendimento[i]->id,
+                               emAtendimento[i]->bairro->nomeDoBairro,
+                               horarioTermino);
+
+                        free(emAtendimento[i]);
+                        emAtendimento[i] = NULL;
+                    }
+                    else
+                    {
+                        printf("     em atendimento... restante: %d min\n\n", tempoRestante[i]);
+                        printf("     -----------------------------------\n");
+                    }
+
                     sistemaVazio = 0;
                 }
-
-                printf("  -> sem ocorrencias nesta rodada\n");
-                printf("     -----------------------------------\n");
-            }
-        }
-
-        tempoGlobal += TEMPO_TICK;
-
-        printf("\n\n================ fim do ciclo (t = %02d:%02d) ================\n\n",
-               tempoGlobal / 60, tempoGlobal % 60);
-
-        printf("\n\n============== estado das filas apos o ciclo ==============\n\n");
-
-        for (int i = 0; i < NUM_SERVICOS; i++)
-        {
-            printf("----------------- fila: %s -----------------\n", TIPOS_SERVICO[i]);
-            printf("id     | chegada  | gravidade | bairro\n");
-            printf("-----------------------------------------------\n");
-
-            if (filas[i]->tamanho == 0)
-            {
-                if (emAtendimento[i] != NULL && tempoRestante[i] > 0)
-                {
-                    printf("em atendimento...\n");
-                }
                 else
                 {
-                    printf("fila vazia\n");
+                    if (filas[i]->tamanho > 0)
+                    {
+                        sistemaVazio = 0;
+                    }
+
+                    printf("  -> sem ocorrencias nesta rodada\n\n");
+                    printf("     -----------------------------------\n");
                 }
             }
-            else
+
+            tempoGlobal += TEMPO_TICK;
+
+            printf("\n\n================ fim do ciclo (t = %02d:%02d) ================\n\n",
+                   tempoGlobal / 60, tempoGlobal % 60);
+
+            printf("\n\n============== estado das filas apos o ciclo ==============\n\n");
+
+    for (int i = 0; i < NUM_SERVICOS; i++)
+    {
+        printf("\n------ fila: %s ------\n", TIPOS_SERVICO[i]);
+        printf("id   | chegada | grav | bairro\n");
+        printf("-------------------------------\n");
+
+        int emAtendendo = (emAtendimento[i] != NULL); // 1 se tem alguém em atendimento, 0 se n
+
+        if (filas[i]->tamanho == 0)
+        {
+            if (emAtendendo && tempoRestante[i] > 0)
             {
-                Ocorrencia *aux = filas[i]->inicio;
-                while (aux != NULL)
-                {
-                    printf("%04d   | %s    | %d         | %s\n",
-                           aux->id,
-                           aux->horarioChegada,
-                           aux->gravidade,
-                           aux->bairro->nomeDoBairro);
-                    aux = aux->prox;
-                }
-            }
+                printf("em atendimento...\n");
+
+            } else {
+
+                printf("fila vazia\n");
+
+                    }
+
 
             printf("total: %d ocorrencia", filas[i]->tamanho);
             if (filas[i]->tamanho != 1)
+            {
                 printf("s");
+            }
 
-            printf(" | em atendimento: ");
-            if (emAtendimento[i] != NULL)
-                printf("1\n\n\n");
-            else
-                printf("0\n\n\n");
 
-            printf("\n");
-        }
+            printf(" | em atendimento: %d ", emAtendendo);
 
+            if (emAtendendo)
+            {
+                printf("(ainda atendendo)\n\n");
+
+            } else {
+
+                if (tempoGlobal >= tempoFinal)
+                    {
+
+                    printf("(fim do horario)\n\n");
+
+                    } else {
+
+                    printf("(pronto para proximo atendimento)\n\n");
+
+                            }
+                    }
+
+        } else {
+                Ocorrencia *aux = filas[i]->inicio;
+                while (aux) {
+                    printf("%04d |   %s   |  %d   | %s\n",
+                           aux->id, aux->horarioChegada, aux->gravidade, aux->bairro->nomeDoBairro);
+                    aux = aux->prox;
+                }
+
+                // mensagem final com if-else
+                printf("total: %d ocorrencia", filas[i]->tamanho);
+                if (filas[i]->tamanho != 1) {
+                    printf("s");
+                }
+
+                printf(" | em atendimento: %d ", emAtendendo);
+
+
+                if (emAtendendo) {
+                    printf("(ainda atendendo)\n\n");
+                } else {
+                    if (tempoGlobal >= tempoFinal) {
+                        printf("(fim do horario)\n\n");
+                    } else {
+                        printf("(pronto para proximo atendimento)\n\n");
+                    }
+                }
+            }
+
+
+        // se todas as filas e atendimentos estão vazios, finalizar
         if (sistemaVazio)
         {
-            printf("todas as filas foram esvaziadas e nenhum atendimento esta em andamento.\n");
-            printf("encerrando a simulacao.\n");
+            printf("todas filas vazias. fim da simulacao.\n");
             break;
         }
     }
 
-    if (tempoGlobal >= tempoFinal)
-    {
-        printf("\nsimulacao finalizada pois horario limite (%02d:%02d) foi atingido.\n",
-               tempoFinal / 60, tempoFinal % 60);
+        if (tempoGlobal >= tempoFinal)
+        {
+            printf("\nsimulacao finalizada. horario limite (18:00) atingido.\n");
+        }
+
     }
 }
 

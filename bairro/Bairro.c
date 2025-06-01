@@ -4,12 +4,12 @@
 #include<string.h>
 
 #define MAXHASH 20
-/* n é mais necessario com o .h
+
 typedef struct Bairro{
     int id;
     char nomeDoBairro[30];
     struct Bairro *prox;
-}Bairro;*/
+}Bairro;
 
 /* Essa é uma alternativa, acredito que pior
 int hashBairro(Bairro *teste){
