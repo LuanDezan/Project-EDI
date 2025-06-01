@@ -369,8 +369,7 @@ void mostrarFilaAtual(DescritorFila *fila, const char *nomeFila)
 
     while (temp)
     {
-        printf("%04d   | %-8s | %-9d | %-10s\n",
-               temp->id, temp->horarioChegada, temp->gravidade, temp->bairro->nomeDoBairro);
+        printf("%04d   | %-8s | %-9d | %-10s\n", temp->id, temp->horarioChegada, temp->gravidade, temp->bairro->nomeDoBairro);
         temp = temp->prox;
         cont++;
     }
