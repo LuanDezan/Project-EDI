@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include"../bairro/Bairro.h"
 
 // struct que representa uma ocorrência com informações como id, horário, gravidade, tipo, bairro e ponteiro para a próxima
 typedef struct Ocorrencia
