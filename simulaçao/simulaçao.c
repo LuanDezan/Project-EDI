@@ -81,7 +81,6 @@ void filaAtendimento(DescritorFila *fila, Ocorrencia *nova)
         if (fila->tamanho == 0)
         {
             fila->fim = nova;
-            fila->tamanho++;
         }
 
     } else {
@@ -102,11 +101,11 @@ void filaAtendimento(DescritorFila *fila, Ocorrencia *nova)
             fila->fim = nova;
         }
 
+    }
 
-    // aumenra tamanho da fila
+        // aumenra tamanho da fila
     fila->tamanho++;
 
-    }
 }
 
 
