@@ -9,7 +9,7 @@
 #define NUM_SERVICOS 4
 #define TEMPO_TICK 10
 
-// estrutura que representa um bairro, com id, nome e ponteiro para próximo bairro na lista encadeada
+// estrutura que representa um bairro, com id, nome e ponteiro para prox bairro na lista encadeada
 typedef struct Bairro
 {
     int id;
@@ -20,7 +20,7 @@ typedef struct Bairro
 
 
 // estrutura que representa uma ocorrencia de emergencia
-// contem id, horários de chegada e atendimento, gravidade (1 a 5), tipo do serviço (hospital, policia, etc), ponteiro para bairro e próxima ocorrencia
+// contem id, horários de chegada e atendimento, gravidade (1 a 5), tipo do serviço (hospital, policia, etc), ponteiro para bairro e prox ocorrencia
 typedef struct Ocorrencia
 {
     int id;
@@ -141,7 +141,7 @@ Ocorrencia *criarOcorrenciaAleatoria(Bairro *tabelaHashBairro)
 
 
 
-  int chegada = tempoGlobal + (rand() % TEMPO_TICK); // tempoGlobal é o início do ciclo atual
+  int chegada = tempoGlobal + (rand() % TEMPO_TICK); // tempoGlobal eh  o inicio do ciclo atual
 formatarHorario(chegada, nova->horarioChegada);
 
 
@@ -288,7 +288,7 @@ for (int i = 0; i < novasOcorrencias; i++)
     if (!nova) continue;
 
     // imprime sempre, pois foi “gerada neste ciclo”,
-    // mesmo que o horário de chegada seja 11:52, 11:57 etc.
+    // mesmo que o h de chegada seja 11:52, 11:57 etc.
     printf("  -> id: %04d | tipo: %s | gravidade: %d | bairro: %s | chegada: %s\n",
            nova->id,
            TIPOS_SERVICO[nova->tipo - 1],
