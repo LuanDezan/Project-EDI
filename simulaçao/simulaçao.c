@@ -146,7 +146,7 @@ Ocorrencia *criarOcorrenciaAleatoria(Bairro *tabelaHashBairro, int ehOcorrenciaN
 void mostrarFilaAtual(DescritorFila *fila, const char *nomeFila) {
     printf("\n----------------- FILA: %s -----------------\n", nomeFila);
     printf("ID    | CHEGADA | GRAVIDADE | BAIRRO\n");
-    printf("------------------------------------\n");
+    printf("----------------------------------------------\n");
 
     Ocorrencia *atual = fila->inicio;
     int cont = 0;
@@ -163,9 +163,9 @@ void mostrarFilaAtual(DescritorFila *fila, const char *nomeFila) {
         printf("FILA VAZIA\n");
     }
   if (cont == 1) {
-    printf("\ntotal: 1 ocorrencia \n\n\n");
+    printf("\nTOTAL: 1 OCORRENCIA \n\n\n");
 } else {
-    printf("\ntotal: %d ocorrencias \n\n\n",
+    printf("\nTOTAL: %d OCORRENCIAS \n\n\n",
            cont);
 }
 }
@@ -191,14 +191,14 @@ void processarFilas(DescritorFila *filas[], int tempoRestante[], Bairro *tabelaH
         }
 
         // mostrar estado das filas antes do atendimento (t = 12:00)
-        const char *TIPOS_SERVICO[NUM_SERVICOS] = {"hospital", "policia", "bombeiro", "samu"};
-        printf("\n=== estado das filas antes do atendimento ===\n");
+        const char *TIPOS_SERVICO[NUM_SERVICOS] = {"hospital", "policia", "bombeiro", "ambulancia"};
+        printf("\n =========== ESTADO INICIAL DAS FILAS ===========\n");
         for (int i = 0; i < NUM_SERVICOS; i++) {
             mostrarFilaAtual(filas[i], TIPOS_SERVICO[i]);
         }
 
         // aviso de inicio de ciclo 0
-        printf("\n======== iniciando ciclo de atendimento (t = 12:00) ========\n");
+        printf("\n\n ======== INICIANDO CICLO DE ATENDIMENTO (HORARIO = 12:00) ========\n");
     }
 
     bool primeiroCiclo = true;
@@ -207,18 +207,18 @@ void processarFilas(DescritorFila *filas[], int tempoRestante[], Bairro *tabelaH
         char horarioAtual[6];
         formatarHorario(tempoGlobal, horarioAtual);
 
-        const char *TIPOS_SERVICO[NUM_SERVICOS]       = {"hospital", "policia", "bombeiro", "samu"};
-        const int   TEMPOS_ATENDIMENTO[NUM_SERVICOS] = {20, 10, 8, 15};
+        const char *TIPOS_SERVICO[NUM_SERVICOS]       = {"hospital", "policia", "bombeiro", "ambulancia"};
+        const int TEMPOS_ATENDIMENTO[NUM_SERVICOS] = {10, 20, 30, 10};
 
         int sistemaVazio = 1;
 
         // so imprime “novo ciclo” a partir do segundo passo em diante
         if (!primeiroCiclo) {
-            printf("\n\n================= novo ciclo de atendimento =================\n");
-            printf(">>> hora atual: %s\n", horarioAtual);
+            printf("\n\n ================= NOVO CICLO DE ATENDIMENTO =================\n");
+            printf(">>> HORARIO ATUAL: %s\n", horarioAtual);
         } else {
             // no primeiro ciclo (tempoGlobal == 720), ja foi emitido “iniciando ciclo”
-            printf(">>> hora atual: %s\n", horarioAtual);
+            printf(" >>> HORARIO ATUAL: %s\n", horarioAtual);
             primeiroCiclo = false;
         }
 
@@ -284,8 +284,8 @@ void processarFilas(DescritorFila *filas[], int tempoRestante[], Bairro *tabelaH
 
                 if (antes > TEMPO_TICK) {
                     // ainda em atendimento
-                    printf("     em atendimento... restante: %d min\n\n", tempoRestante[i]);
-                    printf("     -----------------------------------\n");
+                    printf("     em atendimento... restante: %d min\n", tempoRestante[i]);
+                    printf("     -----------------------------------\n\n");
                 } else {
                     // atendimento concluido neste tick
                     int tempoTermino = tempoGlobal + TEMPO_TICK;
@@ -293,8 +293,8 @@ void processarFilas(DescritorFila *filas[], int tempoRestante[], Bairro *tabelaH
                     formatarHorario(tempoTermino, horarioTermino);
 
                     printf("     atendimento concluido\n");
-                    printf("     -----------------------------------\n");
-                    printf(">> atendimento encerrado para ocorrencia %04d | bairro: %s | as %s\n\n",
+                    printf("     -----------------------------------\n\n");
+                    printf(">> atendimento encerrado para ocorrencia %04d | bairro: %s | as %s\n\n\n",
                            emAtendimento[i]->id,
                            emAtendimento[i]->bairro->nomeDoBairro,
                            horarioTermino);
@@ -309,14 +309,14 @@ void processarFilas(DescritorFila *filas[], int tempoRestante[], Bairro *tabelaH
                 if (filas[i]->tamanho > 0) {
                     sistemaVazio = 0;
                 }
-                printf("  -> sem ocorrencias nesta rodada\n\n");
-                printf("     -----------------------------------\n");
+                printf("  -> sem ocorrencias nesta rodada\n");
+                printf("     -----------------------------------\n\n");
             }
         }
 
         // 3) gerar novas ocorrencias durante este ciclo
         int novasOcorrencias = 1 + rand() % 3;
-        printf("\n--> novas ocorrencias geradas neste ciclo: %d\n", novasOcorrencias);
+        printf("\n\n --> NOVAS OCORRENCIAS GERADAS DURANTE O CICLO: %d\n", novasOcorrencias);
         for (int i = 0; i < novasOcorrencias; i++) {
             Ocorrencia *nova = criarOcorrenciaAleatoria(tabelaHashBairro, 1); // 1 = nova
             if (nova) {
@@ -332,15 +332,15 @@ void processarFilas(DescritorFila *filas[], int tempoRestante[], Bairro *tabelaH
 
         // 4) avancar o tempo
         tempoGlobal += TEMPO_TICK;
-        printf("\n\n================ fim do ciclo (t = %02d:%02d) ================\n\n",
+        printf("\n\n\n================ FIM DO CICLO (t = %02d:%02d) ================\n\n",
                tempoGlobal / 60, tempoGlobal % 60);
 
         // 5) mostrar estado das filas ao fim do ciclo
-        printf("\n\n============== estado das filas apos o ciclo ==============\n\n");
+        printf("\n\n\n============== ESTADO DAS FILAS APOS O CICLO ==============\n\n");
         for (int i = 0; i < NUM_SERVICOS; i++) {
-            printf("\n------ fila: %s ------\n", TIPOS_SERVICO[i]);
-            printf("id   | chegada | grav | bairro\n");
-            printf("-------------------------------\n");
+            printf("\n------ FILA: %s ------\n", TIPOS_SERVICO[i]);
+            printf(" ID   | CHEGADA | GRAVIDADE | BAIRRO \n");
+            printf("------------------------------------------\n");
 
             int emAtendendo = (emAtendimento[i] != NULL);
 
@@ -388,7 +388,7 @@ if (filas[i]->tamanho == 1) {
         }
 
         if (tempoGlobal >= tempoFinal) {
-            printf("\nsimulacao finalizada. horario limite (18:00) atingido.\n");
+            printf("\n\n\n ATENDIMENTO FINALIZADO. HORARIO LIMITE (18:00) ATINGIDO.\n\n\n");
         }
     }
 }
