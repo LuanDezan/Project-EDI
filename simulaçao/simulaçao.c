@@ -141,9 +141,9 @@ Ocorrencia *criarOcorrenciaAleatoria(Bairro *tabelaHashBairro)
 
 
 
-    // desvio aleatorio de no max 9 minutos para a hora de chegada p ficar mais realista
-    int desvio = rand() % TEMPO_TICK;
-    formatarHorario(tempoGlobal - desvio, nova->horarioChegada);
+  int chegada = tempoGlobal + (rand() % TEMPO_TICK); // tempoGlobal é o início do ciclo atual
+formatarHorario(chegada, nova->horarioChegada);
+
 
 
     // escolhe aleatoriamente o bairro pela tabela hash (id e chave)
@@ -172,6 +172,7 @@ Ocorrencia *criarOcorrenciaAleatoria(Bairro *tabelaHashBairro)
 
 
 
+
 void processarFilas(DescritorFila *filas[], int tempoRestante[], Bairro *tabelaHashBairro, Ocorrencia *emAtendimento[])
 {
         int tempoFinal = 18 * 60;
@@ -191,29 +192,26 @@ void processarFilas(DescritorFila *filas[], int tempoRestante[], Bairro *tabelaH
             const char *TIPOS_SERVICO[NUM_SERVICOS] = {"hospital", "policia", "bombeiro", "samu"};
             const int TEMPOS_ATENDIMENTO[NUM_SERVICOS] = {20, 10, 8, 15};
 
-            int novasOcorrencias = 1 + rand() % 3;
+           /* int novasOcorrencias = 1 + rand() % 3;
 
             printf("\n--> novas ocorrencias geradas neste ciclo: %d\n", novasOcorrencias);
 
-            for (int i = 0; i < novasOcorrencias; i++)
-            {
-                Ocorrencia *nova = criarOcorrenciaAleatoria(tabelaHashBairro);
+for (int i = 0; i < novasOcorrencias; i++)
+{
+    Ocorrencia *nova = criarOcorrenciaAleatoria(tabelaHashBairro);
+    if (!nova) continue;
 
-                if (nova)
-                {
-                    //formatarHorario(tempoGlobal, nova->horarioChegada);
-                    enviarOcorrencia(filas, nova);
+    // imprime sempre, pois foi “gerada neste ciclo”,
+    // mesmo que o horário de chegada seja 11:52, 11:57 etc.
+    printf("  -> id: %04d | tipo: %s | gravidade: %d | bairro: %s | chegada: %s\n",
+           nova->id,
+           TIPOS_SERVICO[nova->tipo - 1],
+           nova->gravidade,
+           nova->bairro->nomeDoBairro,
+           nova->horarioChegada);
 
-                    const char *TIPOS_SERVICO[NUM_SERVICOS] = {"hospital", "policia", "bombeiro", "samu"};
-
-                    printf("  -> id: %04d | tipo: %s | gravidade: %d | bairro: %s | chegada: %s\n",
-                           nova->id,
-                           TIPOS_SERVICO[nova->tipo - 1],
-                           nova->gravidade,
-                           nova->bairro->nomeDoBairro,
-                           nova->horarioChegada);
-                }
-            }
+    enviarOcorrencia(filas, nova);
+}*/
 
             int sistemaVazio = 1;
 
@@ -280,6 +278,26 @@ void processarFilas(DescritorFila *filas[], int tempoRestante[], Bairro *tabelaH
                     printf("     -----------------------------------\n");
                 }
             }
+            int novasOcorrencias = 1 + rand() % 3;
+
+            printf("\n--> novas ocorrencias geradas neste ciclo: %d\n", novasOcorrencias);
+
+for (int i = 0; i < novasOcorrencias; i++)
+{
+    Ocorrencia *nova = criarOcorrenciaAleatoria(tabelaHashBairro);
+    if (!nova) continue;
+
+    // imprime sempre, pois foi “gerada neste ciclo”,
+    // mesmo que o horário de chegada seja 11:52, 11:57 etc.
+    printf("  -> id: %04d | tipo: %s | gravidade: %d | bairro: %s | chegada: %s\n",
+           nova->id,
+           TIPOS_SERVICO[nova->tipo - 1],
+           nova->gravidade,
+           nova->bairro->nomeDoBairro,
+           nova->horarioChegada);
+
+    enviarOcorrencia(filas, nova);
+}
 
             tempoGlobal += TEMPO_TICK;
 
