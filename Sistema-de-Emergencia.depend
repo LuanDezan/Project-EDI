@@ -57,11 +57,12 @@
 1748739720 source:d:\mandartudolinux\ed1\project-edi\cidadao\cidadao.c
 	<stdio.h>
 
-1748825968 source:d:\mandartudolinux\ed1\project-edi\simulaçao\simulaçao.c
+1748875224 source:d:\mandartudolinux\ed1\project-edi\simulaçao\simulaçao.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<time.h>
+	<stdbool.h>
 
 1748625432 d:\mandartudolinux\ed1\project-edi\cidadao\cidadao.c
 	<stdio.h>
@@ -98,11 +99,12 @@
 	<string.h>
 	<time.h>
 
-1748745114 source:d:\mandartudolinux\ed1\project-edi\main\main.c
+1748874037 source:d:\mandartudolinux\ed1\project-edi\main\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<time.h>
+	<stdbool.h>
 
 1748739720 source:d:\mandartudolinux\ed1\project-edi\main\main - copia.c
 	<stdlib.h>
