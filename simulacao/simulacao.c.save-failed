@@ -1,0 +1,401 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <stdbool.h>
+
+#include <float.h>
+#include <math.h>
+#include "../constantes/constantes.h"
+#include "../constantes/simulacao.h"
+#include "../constantes/sistemaEmergencia.h"
+
+const char *NOME_SERVICOS[] = {"hospital", "policia", "bombeiro"};
+const int TEMPOS_ATENDIMENTO[] = {8, 15, 12};  // Tempos de atendimento reduzidos
+time_t tempoGlobal = 720;
+Atendimento atendimentos_em_curso[NUM_BAIRROS][NUM_SERVICOS] = {0};
+
+// Protótipo adicional
+void exibirDetalhesCidadao(const Cidadao *cid);
+
+
+
+int minutosFromHorario(const char* horario) {
+    int horas, minutos;
+    sscanf(horario, "%d:%d", &horas, &minutos);
+    return horas * 60 + minutos;
+}
+
+
+
+void formatarHorario(int totalMinutos, char *saida) {
+    totalMinutos = totalMinutos % (24*60);
+    int horas = totalMinutos / 60;
+    int minutos = totalMinutos % 60;
+    sprintf(saida, "%02d:%02d", horas, minutos);
+}
+
+
+void exibirDetalhesCidadao(const Cidadao *cid) {
+    printf("   cidadao: %s (CPF: %s)\n", cid->nomeCidadao, cid->CPF);
+    printf("   residencia: Bairro %d | localizacao atual: (%.4f, %.4f)\n",
+           cid->idBairroDeResidencia, cid->latitude_atual, cid->longitude_atual);
+}
+
+void exibirOcorrenciaDetalhada(const Ocorrencia *oc, Bairro tabelaHashBairro[]) {
+   bool usaProximo = (oc->gravidade >= 4);
+
+    printf("\n>> Ocorrencia %04d\n",oc->id);
+
+    exibirDetalhesCidadao(oc->cidadao);
+
+    printf(
+      "   criterio: %s\n"
+      "   bairro_atendimento: %s\n",usaProximo ? "mais proximo" : "residencia",oc->bairro->nomeDoBairro);
+
+    printf("   gravidade: %d | descricao: %s\n", oc->gravidade, oc->descricao);
+    printf("   tarefas:\n");
+    for (Tarefa *t = oc->tarefas; t; t = t->prox) {
+        const char *nome = (t->servico == BOMBEIRO) ? "bombeiro"
+                          : (t->servico == HOSPITAL)  ? "hospital"
+                          : "policia";
+        printf("    - %s [%s]\n",nome,t->concluida ? "concluida" : "pendente");
+    }
+    printf("-----------------------------------\n");
+}
+
+void adicionarTarefa(Ocorrencia* oc, int servico) {
+    if (!oc) return;
+    Tarefa* nova = malloc(sizeof(Tarefa));
+    if (!nova) return;
+    nova->servico = servico;
+    nova->concluida = false;
+    strcpy(nova->horarioConclusao, "--:--");
+    nova->prox = oc->tarefas;
+    oc->tarefas = nova;
+}
+
+void inicializarDescritorFila(DescritorFila *fila) {
+    fila->fim     = NULL;
+    fila->inicio  = NULL;
+    fila->tamanho = 0;
+}
+
+void filaAtendimento(DescritorFila *fila, Ocorrencia *nova) {
+    if (!fila || !nova) return;
+    nova->prox = NULL;
+
+    if (fila->tamanho == 0) {
+        fila->inicio = nova;
+        fila->fim = nova;
+    } else {
+        // Inserção por prioridade (gravidade)
+        if (nova->gravidade > fila->inicio->gravidade) {
+            nova->prox = fila->inicio;
+            fila->inicio = nova;
+        } else {
+            Ocorrencia *atual = fila->inicio;
+            while (atual->prox && nova->gravidade <= atual->prox->gravidade) {
+                atual = atual->prox;
+            }
+            nova->prox = atual->prox;
+            atual->prox = nova;
+            if (!nova->prox) fila->fim = nova;
+        }
+    }
+    fila->tamanho++;
+}
+
+int gerarOcorrenciasIniciais(Bairro *tabelaHashBairro, Cidadao *tabelaHashCidadao[],DescritorFila *filas[NUM_BAIRROS][NUM_SERVICOS])
+{
+    int count = 10 + rand() % 20;  // 10-30 ocorrências
+
+    for (int i = 0; i < count; i++) {
+        Ocorrencia *oc = criarOcorrenciaAleatoria(
+            tabelaHashBairro,
+            tabelaHashCidadao,  // Tipo correto
+            false,
+            MAXHASH
+        );
+        if (oc) {
+            int servico = oc->tipo;
+            int bairro_idx = oc->bairro->id - 1;
+            filaAtendimento(filas[bairro_idx][servico], oc);
+        }
+    }
+    return count;
+}
+
+Ocorrencia *criarOcorrenciaAleatoria(Bairro tabelaHashBairro[],Cidadao *tabelaHashCidadao[],bool ehNova,  int maxHash)
+{
+    Ocorrencia *oc = calloc(1, sizeof(Ocorrencia));
+    if (!oc) return NULL;
+
+    oc->cidadao = selecionar_cidadao_aleatorio(tabelaHashCidadao, maxHash);
+    if (!oc->cidadao) { free(oc); return NULL; }
+
+    oc->id = rand() % 10000;
+    oc->gravidade = rand() % 5 + 1;
+
+    // Tipos de ocorrência mais variados e realistas
+    const char *descricoes[][5] = {
+        // Gravidade 1
+        {"Mal-estar leve", "Perturbação de sossego", "Furto simples", "Animal doméstico perdido", "Problema de trânsito leve"},
+        // Gravidade 2
+        {"Acidente sem vítimas", "Roubo de celular", "Incêndio pequeno", "Intoxicação alimentar", "Briga de rua"},
+        // Gravidade 3
+        {"Acidente com vítimas leves", "Assalto a residência", "Incêndio em área verde", "Queda de árvore", "Ameaça com arma branca"},
+        // Gravidade 4
+        {"Incêndio residencial", "Acidente grave", "Tentativa de homicídio", "Pessoa desaparecida", "Violência doméstica"},
+        // Gravidade 5
+        {"Incêndio de grandes proporções", "Acidente com múltiplas vítimas", "Sequestro", "Desabamento", "Tiroreio em via pública"}
+    };
+
+    // Tipos de serviço baseados na gravidade
+    int tipos_servico[][3] = {
+        {HOSPITAL, POLICIA, POLICIA},     // Grav 1
+        {HOSPITAL, POLICIA, BOMBEIRO},    // Grav 2
+        {HOSPITAL, POLICIA, BOMBEIRO},    // Grav 3
+        {BOMBEIRO, HOSPITAL, POLICIA},    // Grav 4
+        {BOMBEIRO, HOSPITAL, POLICIA}     // Grav 5
+    };
+
+    int grav_idx = oc->gravidade - 1;
+    int desc_idx = rand() % 5;
+    int tipo_idx = rand() % 3;
+
+    oc->tipo = tipos_servico[grav_idx][tipo_idx];
+    strncpy(oc->descricao, descricoes[grav_idx][desc_idx], sizeof(oc->descricao));
+
+    // Requisitos baseados no tipo e gravidade
+    oc->requer_bombeiro = (oc->tipo == BOMBEIRO) || (oc->gravidade >= 4 && rand() % 100 > 30);
+    oc->requer_hospital  = (oc->tipo == HOSPITAL) || (oc->gravidade >= 3 && rand() % 100 > 40);
+    oc->requer_policia   = (oc->tipo == POLICIA) || (oc->gravidade >= 2 && rand() % 100 > 20);
+
+    // Adicionar tarefas necessárias
+    oc->tarefas = NULL;
+    if (oc->requer_bombeiro) adicionarTarefa(oc, BOMBEIRO);
+    if (oc->requer_hospital)  adicionarTarefa(oc, HOSPITAL);
+    if (oc->requer_policia)   adicionarTarefa(oc, POLICIA);
+
+    // Garantir pelo menos uma tarefa
+    if (!oc->tarefas) {
+        adicionarTarefa(oc, oc->tipo);
+    }
+
+    // Balanceamento: 60% no bairro de residência, 40% no mais próximo
+    if (rand() % 100 < 60) {
+        oc->bairro = buscar_bairro_por_id(
+            tabelaHashBairro,
+            oc->cidadao->idBairroDeResidencia,
+            maxHash);
+    } else {
+        oc->bairro = encontrar_bairro_mais_proximo(
+            oc->cidadao->latitude_atual,
+            oc->cidadao->longitude_atual,
+            tabelaHashBairro, maxHash);
+    }
+
+    // Fallback se bairro não encontrado
+    if (!oc->bairro) {
+        oc->bairro = buscar_bairro_por_id(tabelaHashBairro, (rand() % NUM_BAIRROS) + 1, maxHash);
+    }
+
+    // Gerar horário de chegada com variação maior
+    int offset = ehNova ? (rand() % (TEMPO_TICK * 2)) - TEMPO_TICK : -(rand() % 15 + 5);
+   formatarHorario(tempoGlobal + offset, oc->horarioChegada);
+
+    if (ehNova) {
+        // Novas ocorrências DURANTE o ciclo: entre tempoGlobal e tempoGlobal + TEMPO_TICK
+        int offset = rand() % TEMPO_TICK;
+        formatarHorario(tempoGlobal + offset, oc->horarioChegada);
+    } else {
+        // Ocorrências pré-existentes: até 60 minutos antes do início
+        int offset = -(rand() % 60 + 1);
+        formatarHorario(tempoGlobal + offset, oc->horarioChegada);
+    }
+
+    return oc;
+}
+
+
+
+
+
+void exibirEstadoInicialFilas(DescritorFila *filas[NUM_BAIRROS][NUM_SERVICOS], Bairro tabelaHashBairro[]) {
+    printf("\n=========== ESTADO INICIAL DAS FILAS ===========\n");
+    for (int b = 0; b < NUM_BAIRROS; b++) {
+        Bairro *bairro = buscar_bairro_por_id(tabelaHashBairro, b+1, MAXHASH);
+        printf("\nBAIRRO : %s\n", bairro->nomeDoBairro);
+
+        for (int s = 0; s < NUM_SERVICOS; s++) {
+            printf("----------------- FILA: %s -----------------\n", NOME_SERVICOS[s]);
+            printf("ID    | CHEGADA | GRAVIDADE | BAIRRO\n");
+            printf("----------------------------------------------\n");
+
+            if (filas[b][s]->tamanho == 0) {
+                printf("FILA VAZIA\n");
+            } else {
+                Ocorrencia *atual = filas[b][s]->inicio;
+                while (atual) {
+                    printf("%04d  | %s    | %d         | %s\n",
+                           atual->id,
+                           atual->horarioChegada,
+                           atual->gravidade,
+                           bairro->nomeDoBairro);
+                    atual = atual->prox;
+                }
+            }
+            printf("\nTOTAL: %d OCORRÊNCIAS\n\n", filas[b][s]->tamanho);
+        }
+    }
+}
+
+void exibirEstadoPosCiclo(DescritorFila *filas[NUM_BAIRROS][NUM_SERVICOS], Bairro tabelaHashBairro[]) {
+    char horario_str[6];
+    formatarHorario(tempoGlobal, horario_str);
+
+    printf("\n============== ESTADO DAS FILAS APOS O CICLO ==============\n");
+
+    for (int b = 0; b < NUM_BAIRROS; b++) {
+        Bairro *bairro = buscar_bairro_por_id(tabelaHashBairro, b+1, MAXHASH);
+        printf("\n%s\n", bairro->nomeDoBairro);
+
+        for (int s = 0; s < NUM_SERVICOS; s++) {
+            printf("------ FILA: %s ------\n", NOME_SERVICOS[s]);
+            printf(" ID   | CHEGADA | GRAVIDADE | BAIRRO\n");
+            printf("------------------------------------------\n");
+
+            if (filas[b][s]->tamanho == 0 && !atendimentos_em_curso[b][s].ocorrencia) {
+                printf("FILA VAZIA\n");
+            } else {
+                // Mostrar ocorrências em atendimento
+                if (atendimentos_em_curso[b][s].ocorrencia) {
+                    Ocorrencia *oc = atendimentos_em_curso[b][s].ocorrencia;
+                    printf("%04d |   %s   |  %d   | %s [EM ATENDIMENTO]\n",
+                           oc->id, oc->horarioChegada, oc->gravidade, bairro->nomeDoBairro);
+                }
+
+                // Mostrar fila de espera
+                Ocorrencia *atual = filas[b][s]->inicio;
+                while (atual) {
+                    printf("%04d |   %s   |  %d   | %s\n",
+                           atual->id, atual->horarioChegada, atual->gravidade, bairro->nomeDoBairro);
+                    atual = atual->prox;
+                }
+            }
+
+            // Resumo
+            int em_atendimento = atendimentos_em_curso[b][s].ocorrencia ? 1 : 0;
+            printf("\ntotal: %d ocorrencia(s) | em atendimento: %d\n\n",
+                   filas[b][s]->tamanho + em_atendimento, em_atendimento);
+        }
+    }
+}
+
+void processarCicloAtendimento(DescritorFila *filas[NUM_BAIRROS][NUM_SERVICOS],Bairro tabelaHashBairro[],Cidadao *tabelaHashCidadao[])
+ {
+  char horario_str[6];
+formatarHorario(tempoGlobal, horario_str);
+
+    printf("\n\n======== INICIANDO CICLO DE ATENDIMENTO (HORARIO = %s) ========\n", horario_str);
+
+    // Processar cada bairro
+    for (int b = 0; b < NUM_BAIRROS; b++) {
+        Bairro *bairro = buscar_bairro_por_id(tabelaHashBairro, b+1, MAXHASH);
+        printf("\n>>> BAIRRO: %s | HORARIO ATUAL: %s\n", bairro->nomeDoBairro, horario_str);
+
+        // Processar cada serviço no bairro
+        for (int s = 0; s < NUM_SERVICOS; s++) {
+            printf("\n %-9s | hora: %s\n", NOME_SERVICOS[s], horario_str);
+
+             if (atendimentos_em_curso[b][s].ocorrencia) {
+        Atendimento *at = &atendimentos_em_curso[b][s];
+        at->tempo_restante -= TEMPO_TICK;
+
+        if (at->tempo_restante <= 0) {
+            // Calcular tempo de espera CORRETAMENTE
+            int chegada_min = minutosFromHorario(at->ocorrencia->horarioChegada);
+            int espera = tempoGlobal - chegada_min;
+
+            printf("  -> id: %04d\n", at->ocorrencia->id);
+            exibirDetalhesCidadao(at->ocorrencia->cidadao);
+            printf("     gravidade: %d | bairro: %s\n", at->ocorrencia->gravidade, bairro->nomeDoBairro);
+            printf("     chegada: %s | espera: %d min\n",
+                   at->ocorrencia->horarioChegada,
+                   espera);
+            printf("     atendimento concluido\n");
+            // ...
+        } else {
+            // Mesma correção para atendimento em andamento
+            int chegada_min = minutosFromHorario(at->ocorrencia->horarioChegada);
+            int espera = tempoGlobal - chegada_min;
+
+            printf("  -> id: %04d\n", at->ocorrencia->id);
+            exibirDetalhesCidadao(at->ocorrencia->cidadao);
+            printf("     gravidade: %d | bairro: %s\n", at->ocorrencia->gravidade, bairro->nomeDoBairro);
+            printf("     chegada: %s | espera: %d min\n",
+                   at->ocorrencia->horarioChegada,
+                   espera);
+            printf("     em atendimento... restante: %d min\n", at->tempo_restante);
+        }
+    }
+            else if (filas[b][s]->inicio) {
+                Ocorrencia *oc = filas[b][s]->inicio;
+                filas[b][s]->inicio = oc->prox;
+                filas[b][s]->tamanho--;
+                if (filas[b][s]->tamanho == 0) filas[b][s]->fim = NULL;
+
+                // Iniciar atendimento
+                atendimentos_em_curso[b][s].ocorrencia = oc;
+                atendimentos_em_curso[b][s].tempo_restante = TEMPOS_ATENDIMENTO[s];
+                strcpy(atendimentos_em_curso[b][s].horario_inicio, horario_str);
+
+                printf("  -> id: %04d\n", oc->id);
+                exibirDetalhesCidadao(oc->cidadao);
+                printf("     gravidade: %d | bairro: %s\n", oc->gravidade, bairro->nomeDoBairro);
+                printf("     chegada: %s | espera: %d min\n",
+                       oc->horarioChegada,
+                       (tempoGlobal - (oc->horarioChegada[0]*60 + oc->horarioChegada[1])));
+                printf("     em atendimento... restante: %d min\n", TEMPOS_ATENDIMENTO[s]);
+            }
+            else {
+                printf("  -> sem ocorrencias nesta rodada\n");
+            }
+            printf("     -----------------------------------\n");
+        }
+
+        // Gerar novas ocorrências para este bairro - MAIS OCORRÊNCIAS
+        printf("\n--> NOVAS OCORRENCIAS GERADAS DURANTE O CICLO:\n");
+
+        // Aumento significativo de ocorrências
+        int max_novas = 5;  // Até 5 novas ocorrências por bairro por ciclo
+
+        int novas = (rand() % max_novas) + 1;  // 1-5 novas ocorrências
+
+        for (int i = 0; i < novas; i++) {
+            Ocorrencia *oc = criarOcorrenciaAleatoria(tabelaHashBairro, tabelaHashCidadao, 0, MAXHASH);
+            if (oc) {
+                // Determinar serviço principal
+                int servico = oc->tipo;
+                // Adicionar na fila do bairro correspondente
+                int bairro_idx = oc->bairro->id - 1;
+                filaAtendimento(filas[bairro_idx][servico], oc);
+
+                // Exibir detalhes da nova ocorrência
+                printf("  -> Nova ocorrencia %04d\n", oc->id);
+                exibirDetalhesCidadao(oc->cidadao);
+                printf("     tipo: %s | gravidade: %d | bairro_atendimento: %s | chegada: %s\n",
+                       NOME_SERVICOS[servico],
+                       oc->gravidade,
+                       oc->bairro->nomeDoBairro,
+                       oc->horarioChegada);
+                printf("     descricao: %s\n", oc->descricao);
+                printf("     -----------------------------------\n");
+            }
+        }
+    }
+
+    // Exibir estado após o ciclo
+    exibirEstadoPosCiclo(filas, tabelaHashBairro);
+}

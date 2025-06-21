@@ -1,5 +1,5 @@
-#include<stdio.h>
-#include"..\constantes\constantes.h"
+/*#include<stdio.h>
+#include"../constantes/constantes.h"
 
 typedef struct bombeiros{
     int id;
@@ -7,3 +7,4 @@ typedef struct bombeiros{
     int localizacao;
     struct bombeiros *prox;
 }bombeiros;
+*/

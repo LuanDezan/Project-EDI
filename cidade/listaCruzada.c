@@ -3,68 +3,16 @@
 #include <string.h>
 #include"../bairro/Bairro.h"
 #include"../constantes/constantes.h"
-#include"../historico/historico.c"
+
 
 // Constantes para limites máximos
-#define MAX_BAIRROS 5
-#define MAX_SERVICOS 4  // Bombeiro, Hospital, Ambulância, Polícia
+#define MAX_BAIRROS 4
+#define MAX_SERVICOS 3  // Bombeiro, Hospital, Polícia
 #define MAX_HISTORICO 100
 
-// Enumeração para os tipos de serviços
-typedef enum {
-    BOMBEIRO,
-    HOSPITAL,
-    AMBULANCIA,
-    POLICIA
-} TipoServico;
-
-typedef struct policia{
-    int id;
-    char nome[MAX];
-    struct policia*prox;
-    historicoOcorrencias historico;
-
-}policia;
-
-typedef struct bombeiros{
-    int id;
-    char nome[MAX];
-    struct bombeiros *prox;
-    historicoOcorrencias historico;
-}bombeiros;
-
-typedef struct SAMU{
-    int id,
-        prioridade, //Prioridade da chamada ativa de atendimento Pensei em 1,2 e 3 sendo o menor numero menos prioridade
-        vazia;      // Se a ambulância está sendo usada = 0, se esta vazia = 1
-        historicoOcorrencias historico;
-    struct SAMU *prox;
-}SAMU;
-
-typedef struct hospital{
-    char nome[MAX];
-    int id;
-    struct hospital*prox;
-    historicoOcorrencias historico;
-
-}hospital;
+//sistema cidade, ligando bairros a serviços
 
 
-// Estrutura do nó da lista cruzada
-typedef struct No {
-    struct Bairro *bairro;     // Ponteiro para o bairro na tabela hash
-    void *servico;             // Ponteiro genérico para o serviço
-    TipoServico tipo_servico;
-    struct No *direita;        // Próximo serviço no mesmo bairro
-    struct No *baixo;          // Próximo bairro com mesmo serviço
-} No;
-
-
-// Estrutura que representa toda a cidade
-typedef struct {
-    No *linhas[MAX_BAIRROS];     // Cada linha representa um bairro
-    No *colunas[MAX_SERVICOS];   // Cada coluna representa um tipo de serviço
-} Cidade;
 
 
 // Inicializa a cidade com todas as posições nulas
@@ -145,12 +93,8 @@ void imprimir_lista_cruzada(Cidade *cidade) {
                     case POLICIA:
                         printf("Policia: %s\n", ((policia*)atual->servico)->nome);
                         break;
-                    case AMBULANCIA:
-                        printf("Ambulancia: %d (Prioridade: %d)\n",
-                               ((SAMU*)atual->servico)->id,
-                               ((SAMU*)atual->servico)->prioridade);
-                        break;
                 }
+
                 atual = atual->direita;
             }
         }
@@ -204,7 +148,7 @@ void destruir_cidade(Cidade *cidade) {
                     case BOMBEIRO: free((bombeiros*)atual->servico); break;
                     case HOSPITAL: free((hospital*)atual->servico); break;
                     case POLICIA: free((policia*)atual->servico); break;
-                    case AMBULANCIA: free((SAMU*)atual->servico); break;
+
                 }
                 servicos_liberados[num_servicos_liberados++] = atual->servico;
             }
@@ -254,7 +198,7 @@ No* buscar_servico_por_nome(Cidade *cidade, const char *nome) {
                 case BOMBEIRO: nome_servico = ((bombeiros*)atual->servico)->nome; break;
                 case HOSPITAL: nome_servico = ((hospital*)atual->servico)->nome; break;
                 case POLICIA: nome_servico = ((policia*)atual->servico)->nome; break;
-                case AMBULANCIA: nome_servico = "SAMU"; break;
+
             }
 
             if (nome_servico && strcmp(nome_servico, nome) == 0) {
@@ -270,7 +214,7 @@ No* buscar_servico_por_nome(Cidade *cidade, const char *nome) {
 
 
 // Exemplo de uso na simulação
-int main() {
+/*int main() {
     Cidade cidade;
     inicializar_cidade(&cidade);
 
@@ -306,4 +250,4 @@ int main() {
     imprimir_historico(&samu.historico);
 
     return 0;
-}
+}*/

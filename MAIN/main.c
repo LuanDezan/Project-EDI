@@ -1,80 +1,83 @@
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <string.h>
+        #include <time.h>
+        #include<stdbool.h>
+        #include"../constantes/constantes.h"
+        #include <locale.h>
+        #define MAX 40
+        #define MAXHASH 20
+        #define NUM_BAIRROS 4
+        #define NUM_SERVICOS 3
+        #include"../constantes/simulacao.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include<stdbool.h>
+#include"../constantes/constantes.h"
+#include <locale.h>
 
 #define MAX 40
 #define MAXHASH 20
 #define NUM_BAIRROS 4
-#define NUM_SERVICOS 4
+#define NUM_SERVICOS 3
 
+#include"../constantes/simulacao.h"
 
-
-// estruturas
-
-typedef struct Bairro
-{
-    int id;
-    char nomeDoBairro[30];
-    struct Bairro *prox;
-} Bairro;
-
-typedef struct Ocorrencia
-{
-    int id;
-    char horarioChegada[6];
-    char horarioAtendimento[6];
-    int gravidade;
-    int tipo;
-    Bairro *bairro;
-    struct Ocorrencia *prox;
-} Ocorrencia;
-
-typedef struct
-{
-    Ocorrencia *inicio;
-    Ocorrencia *fim;
-    int tamanho;
-} DescritorFila;
-
-
-int main()
-{
+int main() {
+    setlocale(LC_ALL, "pt_BR.UTF-8");
     srand(time(NULL));
 
+    Cidade cidade;
+    Cidadao *tabelaHashCidadao[MAXHASH] = {NULL};
     Bairro tabelaHashBairro[MAXHASH];
-    for (int i = 0; i < MAXHASH; i++)
+    for (int i = 0; i < MAXHASH; i++) {
+        tabelaHashBairro[i].id = -1;
         tabelaHashBairro[i].prox = NULL;
+    }
 
-    const char *NOMES_BAIRRO[NUM_BAIRROS] = {"Centro", "Norte", "Sul", "Leste"};
+    const char *NOMES_BAIRROS[NUM_BAIRROS] = {"Centro", "Norte", "Sul", "Leste"};
     for (int i = 0; i < NUM_BAIRROS; i++) {
-        cadastrarBairro(i + 1, NOMES_BAIRRO[i], tabelaHashBairro);
+        cadastrarBairro(i+1, NOMES_BAIRROS[i], tabelaHashBairro);
     }
 
-    DescritorFila *filas[NUM_SERVICOS];
-    for (int i = 0; i < NUM_SERVICOS; i++) {
-        filas[i] = malloc(sizeof(DescritorFila));
-        inicializarDescritorFila(filas[i]);
+    inicializarCidade(&cidade, tabelaHashBairro, MAXHASH);
+    criarServicosParaBairros(&cidade, tabelaHashBairro, MAXHASH);
+
+    DescritorFila *filas[NUM_BAIRROS][NUM_SERVICOS];
+    for (int b = 0; b < NUM_BAIRROS; b++) {
+        for (int s = 0; s < NUM_SERVICOS; s++) {
+            filas[b][s] = (DescritorFila*)malloc(sizeof(DescritorFila));
+            inicializarDescritorFila(filas[b][s]);
+        }
     }
 
-    // não pré-carrega ocorrências aqui, deixamos processarFilas() gerar as pré-existentes
-
-    int tempoRestante[NUM_SERVICOS]  = {0};
-    Ocorrencia *emAtendimento[NUM_SERVICOS] = {NULL};
-
-    // processarFilas() já gera as ocorrências pré-existentes e imprime o estado em 12:00
-    processarFilas(filas, tempoRestante, tabelaHashBairro, emAtendimento);
-
-    printf("\n\n============== ESTADO FINAL DAS FILAS ==============\n");
-    const char *TIPOS_SERVICO[NUM_SERVICOS] = {"HOSPITAL", "POLICIA", "BOMBEIRO", "SAMU"};
-    for (int i = 0; i < NUM_SERVICOS; i++) {
-        mostrarFilaAtual(filas[i], TIPOS_SERVICO[i]);
+    printf("\n\nBairros cadastrados:\n");
+    for (int i = 1; i <= NUM_BAIRROS; i++) {
+        Bairro *b = buscar_bairro_por_id(tabelaHashBairro, i, MAXHASH);
+        if (b) {
+            printf("\nBairro %d: %s (%.4f, %.4f)\n", b->id, b->nomeDoBairro, b->latitude, b->longitude);
+        } else {
+            printf("\nBairro %d nao encontrado!\n", i);
+        }
     }
+
+    historicoOcorrencias historico;
+    inicializar_historico(&historico);
+
+    gerarCidadaosAleatorios(tabelaHashCidadao, tabelaHashBairro, MAXHASH);
+    int totalOcorrencias = gerarOcorrenciasIniciais(tabelaHashBairro,tabelaHashCidadao,filas,MAXHASH);
+    exibirEstadoInicialFilas(filas, tabelaHashBairro);
+
+    tempoGlobal = 720;
+    while (tempoGlobal < 1080) {
+        processarCicloAtendimento(filas, tabelaHashBairro, tabelaHashCidadao, &historico);
+    }
+
+    printf("\n\n================ HISTORICO DE OCORRENCIAS ATENDIDAS ================\n");
+    imprimir_historico(&historico);
+    destruir_historico(&historico);
 
     return 0;
 }
-
-
-
-

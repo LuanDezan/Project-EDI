@@ -1,7 +1,8 @@
 #include <stdio.h>
 #define MAXHASH 20
+#include"../constantes/constantes.h"
 
-typedef struct Cidadao{
+/*typedef struct Cidadao{
     char CPF[14],
         nomeCidadao[35],
         email[40];
@@ -9,7 +10,7 @@ typedef struct Cidadao{
     int id,
         idBairroDeResidencia; // Isso seria o endereco
     struct Cidadao *prox;
-}Cidadao;
+}Cidadao;*/
 
 int hashCidadao(int idCidadao){
     int chave = idCidadao;

@@ -2,10 +2,11 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-
+#include"../constantes/constantes.h"
 #define MAXHASH 20
+#include<time.h>
 
-typedef struct Bairro{
+/*typedef struct Bairro{
     int id;
     char nomeDoBairro[30];
     struct Bairro *prox;
@@ -33,29 +34,41 @@ void inicializarTabelaBairro(Bairro *tabela){
     }
 }
 
-void cadastrarBairro(int idNovo, char *nomeNovo, Bairro *tabela){
-    int chave;
 
+
+void cadastrarBairro(int id, const char *nome, Bairro tabela[]) {
+    int hash = id % MAXHASH;
     Bairro *novo = malloc(sizeof(Bairro));
-    if(novo == NULL){
-        printf("Erro de alocação na tabela Hash de Bairro\n");
-        return;
+    novo->id = id;
+    strcpy(novo->nomeDoBairro, nome);
+
+    // Definir coordenadas baseadas no ID
+    switch(id) {
+        case 1: // Centro
+            novo->latitude = -22.9068;
+            novo->longitude = -43.1729;
+            break;
+        case 2: // Norte
+            novo->latitude = -22.8742;
+            novo->longitude = -43.2973;
+            break;
+        case 3: // Sul
+            novo->latitude = -22.9511;
+            novo->longitude = -43.2105;
+            break;
+        case 4: // Leste
+            novo->latitude = -22.8471;
+            novo->longitude = -43.0971;
+            break;
+        default: // Coordenadas padrão
+            novo->latitude = -22.9000 + (id-1)*0.01;
+            novo->longitude = -43.2000 + (id-1)*0.01;
     }
 
-    novo->id = idNovo;
-    strcpy(novo->nomeDoBairro, nomeNovo);
-    novo->prox = NULL; // Até aqui se cria um novo bairro;
-
-    chave = hashBairro(novo->id);
-
-    if(tabela[chave].prox == NULL){
-        tabela[chave].prox = novo;
-    }else{
-        novo->prox = tabela[chave].prox;
-        tabela[chave].prox = novo;
-    }
-    //Insercao concluida
+    novo->prox = tabela[hash].prox;
+    tabela[hash].prox = novo;
 }
+
 
 void removerBairro(Bairro *tabela, int idBairro){ //Essa função me gerou uma dúvida, a gente mantêm os bairros usados em algum lugar fora da tabela hash tbm?
     int chave = hashBairro(idBairro); //Pq como eu teria o id do bairro para buscar ou remover da tabela? Usar um contados para cada struct?
@@ -83,17 +96,18 @@ void removerBairro(Bairro *tabela, int idBairro){ //Essa função me gerou uma d
     free(leitor);
 }
 
-void buscaBairro(Bairro *tabela, int idBairro){
-    int chave = hashBairro(idBairro);
 
-    Bairro *leitor = tabela[chave].prox;
+Bairro* buscar_bairro_por_id(Bairro tabela[], int id, int maxHash) {
+    int hash = id % maxHash;
+    Bairro* atual = tabela[hash].prox;
 
-    while(leitor != NULL && leitor->id != idBairro){
-        leitor = leitor->prox;
+    while (atual) {
+        if (atual->id == id) return atual;
+        atual = atual->prox;
     }
-
-    printf("Bairro %d: %s\n",idBairro, leitor->nomeDoBairro);
+    return NULL; // Não encontrado
 }
+
 
 void resetarTabelaBairro(Bairro *tabela){
     for(int i= 0; i<MAXHASH; i++){

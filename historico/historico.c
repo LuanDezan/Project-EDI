@@ -2,15 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include"../simulacao/ocorrencia.c"
+#include"../constantes/constantes.h"
 
-// Estrutura do histórico como pilha
+
+
+
+
+
+
+
+/* Estrutura do histórico como pilha
 typedef struct {
     Ocorrencia *topo;            // Topo da pilha
     int quantidade;              // Contador de ocorrências
     int proximo_id;              // Auto-incremento para IDs
 } historicoOcorrencias;
-
+*/
 // Inicializa o histórico
 void inicializar_historico(historicoOcorrencias *h) {
     h->topo = NULL;             // Nenhuma ocorrência registrada inicialmente

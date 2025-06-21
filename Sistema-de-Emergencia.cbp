@@ -46,11 +46,20 @@
 		<Unit filename="bairro/Bairro.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="bairro/Bairro.h" />
 		<Unit filename="bombeiro/bombeiro.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="cidade/listaCruzada.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="constantes/constantes.h" />
+		<Unit filename="constantes/simulacao.h" />
+		<Unit filename="constantes/sistemaEmergencia.h" />
 		<Unit filename="hash/hash.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="historico/historico.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="hospital/HospitalComHash.c">
@@ -65,16 +74,13 @@
 		<Unit filename="policia/policia.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="simulaçao/ocorrencia.c">
+		<Unit filename="simulacao/geo.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="simulaçao/simula.c">
+		<Unit filename="simulacao/ocorrencia.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="simulaçao/simulaçao - Copia.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="simulaçao/simulaçao.c">
+		<Unit filename="simulacao/simulacao.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
