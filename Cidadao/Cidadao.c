@@ -78,6 +78,7 @@ void removerCidadao(Cidadao *tabela, int idCidadao){ //Essa função me gerou um
     free(leitor);
 }
 
+
 void buscaCidadao(Cidadao *tabela, int idCidadao){
     int chave = hashCidadao(idCidadao);
 
