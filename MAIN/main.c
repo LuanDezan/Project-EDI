@@ -1,27 +1,18 @@
-        #include <stdio.h>
-        #include <stdlib.h>
-        #include <string.h>
-        #include <time.h>
-        #include<stdbool.h>
-        #include"../constantes/constantes.h"
-        #include <locale.h>
-        #define MAX 40
-        #define MAXHASH 20
-        #define NUM_BAIRROS 4
-        #define NUM_SERVICOS 3
-        #include"../constantes/simulacao.h"
+
+#include"../constantes/constantes.h"
+ #include <locale.h>
+ #define MAX 40
+#define MAXHASH 20
+#define NUM_BAIRROS 4
+#define NUM_SERVICOS 3
+#include"../constantes/simulacao.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include<stdbool.h>
-#include"../constantes/constantes.h"
-#include <locale.h>
 
-#define MAX 40
-#define MAXHASH 20
-#define NUM_BAIRROS 4
-#define NUM_SERVICOS 3
+
 
 #include"../constantes/simulacao.h"
 

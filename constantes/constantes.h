@@ -7,6 +7,7 @@
 #define MAX_SERVICOS 3 // Bombeiro, Hospital, Polícia
 #define MAX_HISTORICO 100
 #include<stdbool.h>
+#include<time.h>
 #define TEMPO_TICK   10
 #define MAXHASH      20
 #define NUM_BAIRROS  4
@@ -197,4 +198,3 @@ DescritorFila *filas[NUM_BAIRROS][NUM_SERVICOS];
 
 
 #endif // CONSTANTE
-
