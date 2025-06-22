@@ -9,34 +9,21 @@
 #include "../constantes/constantes.h"
 #include "../constantes/simulacao.h"
 #include "../constantes/sistemaEmergencia.h"
-// define o limite maximo de ocorrencias que podem ser processadas ao mesmo tempo
 #define MAX_OCORRENCIAS_SIMULTANEAS 200
-
-// contador global para gerar ids unicos para as ocorrencias
 static unsigned int global_id_counter = 0;
 
-// lista de nomes dos servicos disponiveis
-const char *NOME_SERVICOS[] = {"Bombeiro", "Policia", "Hospital"};
-
-// tempo medio de atendimento para cada servico (em minutos)
-const int TEMPOS_ATENDIMENTO[] = {10, 20, 10};
-
-// variavel global que controla o tempo da simulacao (inicia em 12:00)
 time_t tempoGlobal = 720;
-
-// matriz que guarda os atendimentos que estao acontecendo no momento
 Atendimento atendimentos_em_curso[NUM_BAIRROS][NUM_SERVICOS] = {0};
 
-// funcao que converte o tipo de servico em um indice numerico
 static int idxservico(int tipo) {
     switch (tipo) {
         case BOMBEIRO: return 0;
         case HOSPITAL: return 1;
         case POLICIA: return 2;
-        default: return -1; // tipo invalido
+        case AMBULANCIA: return 3; // Novo serviço
+        default: return -1;
     }
 }
-
 // converte um horario no formato string para minutos
 int minutosFromHorario(const char* horario) {
     int horas, minutos;
@@ -110,7 +97,7 @@ void adicionarTarefa(Ocorrencia* oc, int servico) {
 
 // cria uma nova ocorrencia aleatoria
 Ocorrencia *criarOcorrenciaAleatoria(Cidade *cidade, Bairro tabelaHashBairro[], Cidadao *tabelaHashCidadao[], bool ehNova, int maxHash) {
-    Ocorrencia *oc = (Ocorrencia*) malloc(sizeof(Ocorrencia)); // aloca memoria
+    Ocorrencia *oc = (Ocorrencia*) malloc(sizeof(Ocorrencia));
     if (!oc) return NULL; // verifica alocacao
 
     // tenta encontrar um cidadao disponivel
@@ -147,14 +134,13 @@ Ocorrencia *criarOcorrenciaAleatoria(Cidade *cidade, Bairro tabelaHashBairro[], 
     };
 
  // tipos de servicos mais comuns por gravidade
-    int tipos_servico[][3] = {
-        {HOSPITAL, POLICIA, POLICIA},
-        {HOSPITAL, POLICIA, BOMBEIRO},
-        {HOSPITAL, POLICIA, BOMBEIRO},
-        {BOMBEIRO, HOSPITAL, POLICIA},
-        {BOMBEIRO, HOSPITAL, POLICIA}
+ int tipos_servico[][4] = {
+        {HOSPITAL, POLICIA, POLICIA, AMBULANCIA},
+        {HOSPITAL, POLICIA, BOMBEIRO, AMBULANCIA},
+        {HOSPITAL, POLICIA, BOMBEIRO, AMBULANCIA},
+        {BOMBEIRO, HOSPITAL, POLICIA, AMBULANCIA},
+        {BOMBEIRO, HOSPITAL, POLICIA, AMBULANCIA}
     };
-
     // seleciona descricao e tipo baseado na gravidade
     int grav_idx = oc->gravidade - 1;
     int desc_idx = rand() % 5;
@@ -164,17 +150,17 @@ Ocorrencia *criarOcorrenciaAleatoria(Cidade *cidade, Bairro tabelaHashBairro[], 
     strncpy(oc->descricao, descricoes[grav_idx][desc_idx], sizeof(oc->descricao)); // copia descricao
     oc->descricao[sizeof(oc->descricao) - 1] = '\0'; // garante terminator
 
-    // define servicos necessarios baseado na gravidade
     oc->requer_bombeiro = (oc->tipo == BOMBEIRO) || (oc->gravidade >= 4 && rand() % 100 > 30);
     oc->requer_hospital = (oc->tipo == HOSPITAL) || (oc->gravidade >= 3 && rand() % 100 > 40);
     oc->requer_policia = (oc->tipo == POLICIA) || (oc->gravidade >= 2 && rand() % 100 > 20);
+    oc->requer_ambulancia = (oc->tipo == AMBULANCIA) || (oc->gravidade >= 3 && rand() % 100 > 50); // Novo serviço
 
-    // adiciona tarefas conforme servicos necessarios
+    // Adiciona tarefas conforme necessário
     oc->tarefas = NULL;
     if (oc->requer_bombeiro) adicionarTarefa(oc, BOMBEIRO);
     if (oc->requer_hospital) adicionarTarefa(oc, HOSPITAL);
     if (oc->requer_policia) adicionarTarefa(oc, POLICIA);
-
+    if (oc->requer_ambulancia) adicionarTarefa(oc, AMBULANCIA); // Novo serviço
     // garante pelo menos uma tarefa
     if (!oc->tarefas) adicionarTarefa(oc, oc->tipo);
 
@@ -263,6 +249,26 @@ Ocorrencia *criarOcorrenciaAleatoria(Cidade *cidade, Bairro tabelaHashBairro[], 
         formatarHorario(tempoGlobal - offset, oc->horarioChegada);
     }
 
+
+        if (oc->gravidade < 4) {
+        // Gravidade baixa: bairro de residência
+        oc->bairro = buscar_bairro_por_id(tabelaHashBairro,
+                                         oc->cidadao->idBairroDeResidencia,
+                                         maxHash);
+        strcpy(oc->motivoEscolhaBairro, "Bairro residencia (gravidade < 4)");
+    } else {
+        // Gravidade alta: bairro mais próximo
+        oc->bairro = encontrar_bairro_mais_proximo(
+            oc->cidadao->latitude_atual,
+            oc->cidadao->longitude_atual,
+            tabelaHashBairro,
+            maxHash
+        );
+        strcpy(oc->motivoEscolhaBairro, "Bairro mais proximo (gravidade >= 4)");
+    }
+
+
+
     // prepara string com servicos para exibicao
     char servicosStr[100] = "";
     obterServicosStr(oc, servicosStr);
@@ -277,7 +283,8 @@ printf(" Servicos ................: %s\n", servicosStr);
 printf(" Bairro ..................: %s\n", oc->bairro->nomeDoBairro);
 printf(" Descricao ...............: %s\n", oc->descricao);
 printf(" Horario chegada .........: %s\n", oc->horarioChegada);
-printf(" Presente em ............: %d fila(s)\n\n", oc->tarefas_pendentes);
+printf(" Presente em ............: %d fila(s)\n", oc->tarefas_pendentes);
+printf(" Motivo escolha bairro ............: %s\n\n", oc->motivoEscolhaBairro);
 printf("===============================================================================\n");
 
     oc->finalizada = false;

@@ -13,12 +13,17 @@
 #define NUM_SERVICOS 3
 #define TEMPO_TICK 10
 
-// Função para verificar se um serviço está disponível em um bairro
 bool servico_disponivel(Cidade *cidade, int id_bairro, TipoServico tipo) {
     if (id_bairro < 1 || id_bairro > MAX_BAIRROS)
         return false;
 
     int idx_bairro = id_bairro - 1;
+
+    // Verifica se o bairro existe na cidade
+    if (idx_bairro >= MAX_BAIRROS || !cidade->linhas[idx_bairro]) {
+        return false;
+    }
+
     No *atual = cidade->linhas[idx_bairro];
     while (atual) {
         if (atual->tipo_servico == tipo)
@@ -204,38 +209,41 @@ void atualizar_localizacao_cidadaos(Cidadao *tabelaHashCidadao[], int maxHash) {
     }
 }
 
-void criarServicosParaBairros(Cidade *cidade, Bairro tabelaHashBairro[], int maxHash) {
 
+
+void criarServicosParaBairros(Cidade *cidade, Bairro tabelaHashBairro[], int maxHash) {
     for(int hash_idx = 0; hash_idx < maxHash; hash_idx++) {
         Bairro* b = tabelaHashBairro[hash_idx].prox;
         while(b != NULL) {
-
-
-            // Bombeiro
-            bombeiros* bmb = malloc(sizeof(bombeiros));
-            bmb->id = b->id * 10 + BOMBEIRO;
-
-            inserir_servico(cidade, b, bmb, BOMBEIRO);
-
-
-            // Hospital
+            // Serviços fixos (hospital e polícia em todos bairros)
             hospital* hosp = malloc(sizeof(hospital));
             hosp->id = b->id * 10 + HOSPITAL;
-
             inserir_servico(cidade, b, hosp, HOSPITAL);
 
-
-            // Polícia
             policia* pol = malloc(sizeof(policia));
             pol->id = b->id * 10 + POLICIA;
-
             inserir_servico(cidade, b, pol, POLICIA);
 
+            // Serviços aleatórios (bombeiro e ambulância - 50% chance cada)
+            if (rand() % 2 == 0) {
+                bombeiros* bmb = malloc(sizeof(bombeiros));
+                bmb->id = b->id * 10 + BOMBEIRO;
+                inserir_servico(cidade, b, bmb, BOMBEIRO);
+            }
+
+            if (rand() % 2 == 0) {
+                SAMU* amb = malloc(sizeof(SAMU));
+                amb->id = b->id * 10 + AMBULANCIA;
+                inserir_servico(cidade, b, amb, AMBULANCIA);
+            }
 
             b = b->prox;
         }
     }
 }
+
+
+
 
 void verificarConexoes(Cidade *cidade) {
     printf("\nVerificacao da Estrutura:\n");

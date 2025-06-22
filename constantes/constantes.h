@@ -1,17 +1,17 @@
 #ifndef CONSTANTE
-
 #define CONSTANTE
+
 #define MAX 40
 #define HASH_SIZE 20
 #define MAX_BAIRROS 4
-#define MAX_SERVICOS 3 // Bombeiro, Hospital, Polícia
+#define MAX_SERVICOS 4 // Atualizado para 4 serviços
 #define MAX_HISTORICO 100
 #include<stdbool.h>
 #include<time.h>
 #define TEMPO_TICK   10
 #define MAXHASH      20
 #define NUM_BAIRROS  4
-#define NUM_SERVICOS 3  //  hospital, polícia e bombeiro
+#define NUM_SERVICOS 4  // Atualizado: hospital, polícia, bombeiro e ambulância
 
 extern time_t tempoGlobal;
 extern const char *NOME_SERVICOS[];
@@ -74,7 +74,7 @@ typedef enum {
 } TipoOcorrencia;
 
 typedef struct Tarefa {
-    int servico;        // 0=bombeiro, 1=hospital, 2=ambulancia, 3=policia
+    int servico;        // 0=bombeiro, 1=hospital, 2=policia, 3=ambulancia
     bool concluida;     // flag de conclusão da tarefa
     char horarioConclusao[6]; // formato "HH:MM"
     struct Tarefa* prox; // próxima tarefa na lista
@@ -100,6 +100,7 @@ typedef struct Ocorrencia {
     bool requer_ambulancia;
      bool finalizada;
     struct Ocorrencia* prox;    // Próxima ocorrência na fila
+    char motivoEscolhaBairro[50];
 } Ocorrencia;
 
 
@@ -110,17 +111,12 @@ typedef struct {
       int tarefasCount;
 } Atendimento;
 
-
-
 extern Atendimento atendimentos_em_curso[NUM_BAIRROS][NUM_SERVICOS];
 
 // funcoes de manipulacao de tarefas
 void adicionarTarefa(Ocorrencia* oc, int servico);
 bool todasTarefasConcluidas(const Ocorrencia* oc);
 void marcarTarefaConcluida(Ocorrencia* oc, int servico, const char* horario);
-
-
-
 
 typedef struct {
     Ocorrencia *topo;            // Topo da pilha
@@ -139,13 +135,11 @@ typedef struct DescritorFila {
     int tamanho;
 } DescritorFila;
 
-
-
-
 typedef enum {
     BOMBEIRO,
     HOSPITAL,
-    POLICIA
+    POLICIA,
+    AMBULANCIA  // Novo serviço adicionado
 } TipoServico;
 
 typedef struct policia{
@@ -153,33 +147,30 @@ typedef struct policia{
     char nome[MAX];
     struct policia*prox;
     historicoOcorrencias historico;
-
-}policia;
+} policia;
 
 typedef struct bombeiros{
     int id;
     char nome[MAX];
     struct bombeiros *prox;
-        int localizacao;
+    int localizacao;
     historicoOcorrencias historico;
-}bombeiros;
+} bombeiros;
 
 typedef struct SAMU{
-    int id,
-        prioridade, //Prioridade da chamada ativa de atendimento Pensei em 1,2 e 3 sendo o menor numero menos prioridade
-        vazia;      // Se a ambulância está sendo usada = 0, se esta vazia = 1
-        historicoOcorrencias historico;
+    int id;
+    int prioridade; // Prioridade da chamada ativa de atendimento
+    int vazia;      // 0 = em uso, 1 = disponível
+    historicoOcorrencias historico;
     struct SAMU *prox;
-}SAMU;
+} SAMU;
 
 typedef struct hospital{
     char nome[MAX];
     int id;
     struct hospital*prox;
     historicoOcorrencias historico;
-
-}hospital;
-
+} hospital;
 
 // Estrutura do nó da lista cruzada
 typedef struct No {
@@ -190,19 +181,13 @@ typedef struct No {
     struct No *baixo;          // Próximo bairro com mesmo serviço
 } No;
 
-
 // Estrutura que representa toda a cidade
 typedef struct {
     No *linhas[MAX_BAIRROS];     // Cada linha representa um bairro
     No *colunas[MAX_SERVICOS];   // Cada coluna representa um tipo de serviço
 } Cidade;
 
-
-
 extern DescritorFila *filas[NUM_BAIRROS][NUM_SERVICOS];
-
-
-
 
 
 

@@ -6,14 +6,20 @@
 	"../constantes/constantes.h"
 	<time.h>
 
-1750567818 c:\users\mari\documents\project-edi\constantes\constantes.h
+1750623330 c:\users\mari\documents\project-edi\constantes\constantes.h
 	<stdbool.h>
 	<time.h>
 
 1750531868 source:c:\users\mari\documents\project-edi\bombeiro\bombeiro.c
 	"../constantes/constantes.h"
 
-1750555849 source:c:\users\mari\documents\project-edi\cidade\listacruzada.c
+1750534951 source:c:\users\mari\documents\project-edi\cidadao\cidadao.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../constantes/constantes.h"
+
+1750612044 source:c:\users\mari\documents\project-edi\cidade\listacruzada.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -53,40 +59,33 @@
 	<locale.h>
 	"..\constantes\constantes.h"
 
-1750568156 source:c:\users\mari\documents\project-edi\main\main.c
-	"../constantes/constantes.h"
-	<locale.h>
-	"../constantes/simulacao.h"
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	<time.h>
-	<stdbool.h>
-	<conio.h>
-	<stdio.h>
-
-1750559526 c:\users\mari\documents\project-edi\constantes\simulacao.h
-
 1750531868 source:c:\users\mari\documents\project-edi\policia\policia.c
-
-1750534951 source:c:\users\mari\documents\project-edi\cidadao\cidadao.c
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	"../constantes/constantes.h"
 
 1750531868 source:c:\users\mari\documents\project-edi\policia\policiacomhash.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 
-1750531868 source:c:\users\mari\documents\project-edi\samu\samu.c
+1750612058 source:c:\users\mari\documents\project-edi\samu\samu.c
 	<stdio.h>
 	<stdlib.h>
 
+1750620019 source:c:\users\mari\documents\project-edi\simulacao\geo.c
+	<float.h>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<stdbool.h>
+	"../constantes/constantes.h"
+	"../constantes/simulacao.h"
+
+1750612096 c:\users\mari\documents\project-edi\constantes\simulacao.h
+
 1750531868 source:c:\users\mari\documents\project-edi\simulacao\ocorrencia.c
 
-1750569333 source:c:\users\mari\documents\project-edi\simulacao\simulacao.c
+1750620593 source:c:\users\mari\documents\project-edi\simulacao\simulacao.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -101,14 +100,15 @@
 
 1750555032 c:\users\mari\documents\project-edi\constantes\sistemaemergencia.h
 
-1750566365 source:c:\users\mari\documents\project-edi\simulacao\geo.c
-	<float.h>
-	<math.h>
+1750625981 source:c:\users\mari\documents\project-edi\main\main.c
+	"../constantes/constantes.h"
+	<locale.h>
+	"../constantes/simulacao.h"
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<time.h>
 	<stdbool.h>
-	"../constantes/constantes.h"
-	"../constantes/simulacao.h"
+	<conio.h>
+	<stdio.h>
 
