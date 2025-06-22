@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,31 +27,27 @@ void inicializar_historico(historicoOcorrencias *h) {
 }
 
 // Registra nova ocorrência (push)
-bool registrar_ocorrencia(historicoOcorrencias *h, const char *h_chegada, const char *h_atendimento, int gravidade, int tipo, Bairro *bairro) {
+bool registrar_ocorrencia(historicoOcorrencias *h, Ocorrencia *oc, const char *horarioConclusao) {
+    if (!h || !oc || !horarioConclusao) return false;
 
-    // Verifica parâmetros inválidos
-    if (!h || !h_chegada || !h_atendimento || !bairro) {
-        return false;
-    }
-
-    // Aloca memória para a nova ocorrência
     Ocorrencia *nova = malloc(sizeof(Ocorrencia));
-    if (!nova) {
-        return false;
-    }
+    if (!nova) return false;
 
-    // Preenche os dados
-    nova->id = h->proximo_id++;
-    strncpy(nova->horarioChegada, h_chegada, 6);
-    strncpy(nova->horarioAtendimento, h_atendimento, 6);
-    nova->gravidade = gravidade;
-    nova->tipo = tipo;
-    nova->bairro = bairro;
+    nova->id = oc->id;
+    strncpy(nova->horarioChegada, oc->horarioChegada, sizeof(nova->horarioChegada));
+    strncpy(nova->horarioAtendimento, horarioConclusao, sizeof(nova->horarioAtendimento));
+    nova->gravidade = oc->gravidade;
+    nova->tipo = oc->tipo;
+    nova->bairro = oc->bairro;  // Ponteiro para bairro
 
-    // Insere a nova ocorrência no topo da pilha
+    // Não copia tarefas pois não são necessárias no histórico
+    nova->tarefas = NULL;
+    nova->finalizada = true;  // Marca como finalizada
+
+    // Insere no histórico
     nova->prox = h->topo;
     h->topo = nova;
-    h->quantidade++;    // Incrementa o contador de ocorrências
+    h->quantidade++;
 
     return true;
 }
@@ -77,7 +74,7 @@ bool remover_ultima(historicoOcorrencias *h) {
 }
 
 // Imprime o histórico completo
-void imprimir_historico(const historicoOcorrencias *h) {
+void imprime_historico(const historicoOcorrencias *h) {
     if (!h) return;
 
     printf("Historico de Ocorrencias (%d registros):\n", h->quantidade);
@@ -108,3 +105,27 @@ void destruir_historico(historicoOcorrencias *h) {
     h->proximo_id = 1;      // Reseta o ID
 }
 
+
+
+
+
+void imprimir_historico(const historicoOcorrencias* h) {
+    printf("\n\n=== HISTÓRICO DE ATENDIMENTOS ENTRE 12h-18h ===\n");
+    printf("=========================================================\n");
+    printf("%-5s | %-15s | %-8s | %-11s | %-8s \n",
+           "ID", "Bairro", "Chegada", "Atendimento", "Grav");
+    printf("---------------------------------------------------------\n");
+
+    Ocorrencia* atual = h->topo;
+    while(atual) {
+        printf("%-5d | %-15s | %-8s | %-11s | %-8d \n",
+               atual->id,
+               atual->bairro->nomeDoBairro,
+               atual->horarioChegada,
+               atual->horarioAtendimento,
+               atual->gravidade,
+               atual->descricao);
+        atual = atual->prox;
+    }
+    printf("===========================================================\n");
+}

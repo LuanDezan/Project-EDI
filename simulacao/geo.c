@@ -1,58 +1,65 @@
+#include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
-#include"../constantes/constantes.h"
-#define MAXHASH      20
-#define NUM_BAIRROS  4
+#include "../constantes/constantes.h"
+#include "../constantes/simulacao.h"
+
+#define MAXHASH 20
+#define NUM_BAIRROS 4
 #define NUM_SERVICOS 3
-#define TEMPO_TICK   10
-#include <float.h>
-#include <math.h>
+#define TEMPO_TICK 10
 
-#include <math.h>
-#include <float.h>
+// Função para verificar se um serviço está disponível em um bairro
+bool servico_disponivel(Cidade *cidade, int id_bairro, TipoServico tipo) {
+    if (id_bairro < 1 || id_bairro > MAX_BAIRROS)
+        return false;
 
+    int idx_bairro = id_bairro - 1;
+    No *atual = cidade->linhas[idx_bairro];
+    while (atual) {
+        if (atual->tipo_servico == tipo)
+            return true;
+        atual = atual->direita;
+    }
+    return false;
+}
+
+// Encontra o bairro mais próximo com um serviço específico
+Bairro* encontrar_bairro_com_servico(Cidade *cidade, float lat, float lon, TipoServico tipo, Bairro tabela[], int maxHash) {
+    Bairro *melhor_bairro = NULL;
+    float menor_distancia = FLT_MAX;
+
+    for (int i = 0; i < maxHash; i++) {
+        Bairro *b = tabela[i].prox;
+        while (b) {
+            if (servico_disponivel(cidade, b->id, tipo)) {
+                float dist = calcular_distancia(lat, lon, b->latitude, b->longitude);
+                if (dist < menor_distancia) {
+                    menor_distancia = dist;
+                    melhor_bairro = b;
+                }
+            }
+            b = b->prox;
+        }
+    }
+    return melhor_bairro;
+}
 
 void inicializarCidade(Cidade *cidade, Bairro tabelaHashBairro[], int maxHash) {
-    // Inicializa linhas e colunas com NULL
     for(int i = 0; i < MAX_BAIRROS; i++) {
         cidade->linhas[i] = NULL;
     }
     for(int j = 0; j < MAX_SERVICOS; j++) {
         cidade->colunas[j] = NULL;
     }
-
-for(int hash_idx = 0; hash_idx < maxHash; hash_idx++) {
-    Bairro* b = tabelaHashBairro[hash_idx].prox;
-    while(b != NULL) {
-        for(int servico_id = 0; servico_id < MAX_SERVICOS; servico_id++) {
-            No* novo = (No*)malloc(sizeof(No));
-            novo->bairro = b;
-            novo->tipo_servico = servico_id;
-            novo->servico = NULL;
-            novo->direita = NULL;
-            novo->baixo = NULL;
-
-                // Inserir na linha do bairro
-                novo->direita = cidade->linhas[b->id % MAX_BAIRROS];
-                cidade->linhas[b->id % MAX_BAIRROS] = novo;
-
-                // Inserir na coluna do servi�o
-                novo->baixo = cidade->colunas[servico_id];
-                cidade->colunas[servico_id] = novo;
-            }
-            b = b->prox;
-        }
-    }
 }
 
-// Funao para selecionar um cidadzao aleatorio
 Cidadao* selecionar_cidadao_aleatorio(Cidadao *tabelaHashCidadao[], int maxHash) {
     int total = 0;
-    // Conta o num total de cidadaos
     for (int i = 0; i < maxHash; i++) {
         Cidadao *c = tabelaHashCidadao[i];
         while (c != NULL) {
@@ -66,7 +73,6 @@ Cidadao* selecionar_cidadao_aleatorio(Cidadao *tabelaHashCidadao[], int maxHash)
     int indice_aleatorio = rand() % total;
     Cidadao *selecionado = NULL;
 
-    // Percorre a tabela hash para encontrar o cidadao no indice aleatorio
     for (int i = 0; i < maxHash; i++) {
         Cidadao *c = tabelaHashCidadao[i];
         while (c != NULL) {
@@ -83,31 +89,24 @@ Cidadao* selecionar_cidadao_aleatorio(Cidadao *tabelaHashCidadao[], int maxHash)
     return selecionado;
 }
 
-// Funcao para calcular distancia entre coordenadas
 float calcular_distancia(float lat1, float lon1, float lat2, float lon2) {
-    // converso para radianos
     float lat1_rad = lat1 * M_PI / 180.0f;
     float lon1_rad = lon1 * M_PI / 180.0f;
     float lat2_rad = lat2 * M_PI / 180.0f;
     float lon2_rad = lon2 * M_PI / 180.0f;
 
-    // diferen�as
     float dlat = lat2_rad - lat1_rad;
     float dlon = lon2_rad - lon1_rad;
 
-    // formula de Haversine
     float a = sin(dlat/2) * sin(dlat/2) +
               cos(lat1_rad) * cos(lat2_rad) *
               sin(dlon/2) * sin(dlon/2);
-
     float c = 2 * atan2(sqrt(a), sqrt(1-a));
 
-    // rraioo
     const float R = 6371.0f;
     return R * c;
 }
 
-// Funcao para encontrar o bairro mais prerto
 Bairro* encontrar_bairro_mais_proximo(float lat, float lon, Bairro tabela[], int maxHash) {
     Bairro *mais_proximo = NULL;
     float menor_distancia = FLT_MAX;
@@ -140,19 +139,17 @@ void gerarCidadaosAleatorios(Cidadao *tabelaHashCidadao[], Bairro tabelaHashBair
     int totalNomes = sizeof(nomes) / sizeof(nomes[0]);  // = 10
     int cidadaoId = 1;
 
+    // CORREÇÃO: totalNomes em vez de totalNoms
     for (int i = 0; i < totalNomes; i++) {
-        // Cria o cidad
         Cidadao *novo = malloc(sizeof(Cidadao));
         if (!novo) continue;
 
-        // Nome e CPF unicos
         const char *nomeAtual = nomes[i];
         const char *cpfAtual  = cpfs[i];
         strncpy(novo->nomeCidadao, nomeAtual, sizeof(novo->nomeCidadao));
         strncpy(novo->CPF,        cpfAtual,  sizeof(novo->CPF));
         novo->CPF[sizeof(novo->CPF)-1] = '\0';
 
-        //  email: NomeSobrenome@gmail.com (sem espacos)
         char emailBuf[100] = "";
         for (const char *p = nomeAtual; *p; p++) {
             if (*p != ' ') strncat(emailBuf, (char[]){*p,0}, 1);
@@ -161,61 +158,45 @@ void gerarCidadaosAleatorios(Cidadao *tabelaHashCidadao[], Bairro tabelaHashBair
         strncpy(novo->email, emailBuf, sizeof(novo->email));
         novo->email[sizeof(novo->email)-1] = '\0';
 
-        // vai distribuindo em bairros em circulo
         int bairroId = (i % NUM_BAIRROS) + 1;
         Bairro *b = buscar_bairro_por_id(tabelaHashBairro, bairroId, maxHash);
         if (!b) {
-            // fallback ao primeiro bairro
             b = buscar_bairro_por_id(tabelaHashBairro, 1, maxHash);
         }
         novo->idBairroDeResidencia = b->id;
         novo->latitude_atual  = b->latitude  + (rand() % 100 - 50) / 1000.0;
         novo->longitude_atual = b->longitude + (rand() % 100 - 50) / 1000.0;
 
-        // prrenche campos
         novo->id = cidadaoId++;
         novo->emMovimento     = rand() % 3;
         novo->ultimaAtualizacao = time(NULL);
         novo->prox = NULL;
 
-        // coloca na hash
         int hash = novo->id % maxHash;
         novo->prox = tabelaHashCidadao[hash];
         tabelaHashCidadao[hash] = novo;
 
-        // log
-        printf(
-            "Cidadao gerado: %s | Bairro: %d | Coord: (%.4f, %.4f) "
-            "| CPF: %s | EMAIL: %s\n\n",
-            novo->nomeCidadao,
-            novo->idBairroDeResidencia,
-            novo->latitude_atual,
-            novo->longitude_atual,
-            novo->CPF,
-            novo->email
-        );
+printf("\n┌───────────────────── NOVO CIDADAO GERADO ────────────────────┐\n");
+printf("│ %-58s   │\n", novo->nomeCidadao);
+printf("├──────────────────────────────────────────────────────────────┤\n");
+printf("│   Bairro: %-50d │\n", novo->idBairroDeResidencia);
+printf("│   Coordenadas: (%-8.4f, %-8.4f)                          │\n",
+       novo->latitude_atual, novo->longitude_atual);
+printf("│   CPF: %-54s│\n", novo->CPF);
+printf("│   Email: %-40s            │\n", novo->email);
+printf("└──────────────────────────────────────────────────────────────┘\n\n\n");
+
     }
 }
-
-
-
-
-
-
 
 void atualizar_localizacao_cidadaos(Cidadao *tabelaHashCidadao[], int maxHash) {
     for (int i = 0; i < maxHash; i++) {
         Cidadao *c = tabelaHashCidadao[i];
         while (c != NULL) {
             if (c->emMovimento > 0) {
-                // fator de movimento baseado no tipo (caminhada/ve�culo)
                 float fator = c->emMovimento == 1 ? 0.001f : 0.01f;
-
-                // atualiza posicao com pequena variacao aleatoria
                 c->latitude_atual += (rand() % 200 - 100) * fator / 1000.0f;
                 c->longitude_atual += (rand() % 200 - 100) * fator / 1000.0f;
-
-                // Atualiza tempo
                 c->ultimaAtualizacao = time(NULL);
             }
             c = c->prox;
@@ -224,68 +205,52 @@ void atualizar_localizacao_cidadaos(Cidadao *tabelaHashCidadao[], int maxHash) {
 }
 
 void criarServicosParaBairros(Cidade *cidade, Bairro tabelaHashBairro[], int maxHash) {
+
     for(int hash_idx = 0; hash_idx < maxHash; hash_idx++) {
         Bairro* b = tabelaHashBairro[hash_idx].prox;
         while(b != NULL) {
-            printf("Criando servicos para bairro %d: %s\n", b->id, b->nomeDoBairro);
 
-            for (int servico_id = 0; servico_id < NUM_SERVICOS; servico_id++) {
-                No* atual = cidade->linhas[b->id % MAX_BAIRROS];
-                bool encontrado = false;
 
-                while(atual != NULL && !encontrado) {
-                    if(atual->bairro && atual->bairro->id == b->id) {
-                        // Criar servi�o apenas para o tipo correspondente
-                        if(atual->tipo_servico == servico_id) {
-                            switch(servico_id) {
-                                case BOMBEIRO: {
-                                    bombeiros* bmb = malloc(sizeof(bombeiros));
-                                    bmb->id = b->id * 10 + servico_id;
-                                    sprintf(bmb->nome, "Bombeiros %s", b->nomeDoBairro);
-                                    atual->servico = bmb;
-                                    encontrado = true;
-                                    break;
-                                }
-                                case HOSPITAL: {
-                                    hospital* hosp = malloc(sizeof(hospital));
-                                    hosp->id = b->id * 10 + servico_id;
-                                    sprintf(hosp->nome, "Hospital %s", b->nomeDoBairro);
-                                    atual->servico = hosp;
-                                    encontrado = true;
-                                    break;
-                                }
-                                case POLICIA: {
-                                    policia* pol = malloc(sizeof(policia));
-                                    pol->id = b->id * 10 + servico_id;
-                                    sprintf(pol->nome, "Delegacia %s", b->nomeDoBairro);
-                                    atual->servico = pol;
-                                    encontrado = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    atual = atual->direita;
-                }
-            }
+            // Bombeiro
+            bombeiros* bmb = malloc(sizeof(bombeiros));
+            bmb->id = b->id * 10 + BOMBEIRO;
+
+            inserir_servico(cidade, b, bmb, BOMBEIRO);
+
+
+            // Hospital
+            hospital* hosp = malloc(sizeof(hospital));
+            hosp->id = b->id * 10 + HOSPITAL;
+
+            inserir_servico(cidade, b, hosp, HOSPITAL);
+
+
+            // Polícia
+            policia* pol = malloc(sizeof(policia));
+            pol->id = b->id * 10 + POLICIA;
+
+            inserir_servico(cidade, b, pol, POLICIA);
+
+
             b = b->prox;
         }
     }
 }
-
 
 void verificarConexoes(Cidade *cidade) {
     printf("\nVerificacao da Estrutura:\n");
     for (int i = 0; i < MAX_BAIRROS; i++) {
         int contador = 0;
         No *atual = cidade->linhas[i];
-        // conta quantos servicos ligados a esse bairro
         while (atual) {
             contador++;
             atual = atual->direita;
         }
-        // i+1 para exibir bairros de 1..4
         printf("Bairro %d tem %d servicos conectados\n", i + 1, contador);
     }
 }
+
+
+
+
 

@@ -38,35 +38,59 @@ No* criar_no(Bairro *bairro, void *servico, TipoServico tipo) {
     return novo;
 }
 
-// Insere um serviço na estrutura da cidade (lista cruzada)
 void inserir_servico(Cidade *cidade, Bairro *bairro, void *servico, TipoServico tipo) {
-    if (!cidade || !bairro || !servico || bairro->id < 0 || bairro->id >= MAX_BAIRROS) {
-        printf("Parametros invalidos!\n");
+    if (!cidade || !bairro || !servico || bairro->id < 1 || bairro->id > MAX_BAIRROS) {
+        printf("Parametros invalidos para insercao de servico! Bairro ID: %d\n", bairro->id);
         return;
     }
 
     No *novo = criar_no(bairro, servico, tipo);
     if (!novo) return;
 
-    // Insere na linha correspondente ao bairro (ordenado por tipo de serviço)
-    No **atual_linha = &(cidade->linhas[bairro->id]);
+    // Índice ajustado para arrays (bairro id 1 = índice 0)
+    int idx_bairro = bairro->id - 1;
 
-    while (*atual_linha && (*atual_linha)->tipo_servico < tipo) {
-        atual_linha = &((*atual_linha)->direita);
+    // Insere na linha do bairro (ordenado por tipo de serviço)
+    if (cidade->linhas[idx_bairro] == NULL) {
+        cidade->linhas[idx_bairro] = novo;
+    } else {
+        No *atual = cidade->linhas[idx_bairro];
+        No *anterior = NULL;
+
+        while (atual && atual->tipo_servico < tipo) {
+            anterior = atual;
+            atual = atual->direita;
+        }
+
+        if (anterior == NULL) {
+            novo->direita = cidade->linhas[idx_bairro];
+            cidade->linhas[idx_bairro] = novo;
+        } else {
+            novo->direita = anterior->direita;
+            anterior->direita = novo;
+        }
     }
 
-    novo->direita = *atual_linha;
-    *atual_linha = novo;
+    // Insere na coluna do tipo de serviço (ordenado por id do bairro)
+    if (cidade->colunas[tipo] == NULL) {
+        cidade->colunas[tipo] = novo;
+    } else {
+        No *atual = cidade->colunas[tipo];
+        No *anterior = NULL;
 
-    // Insere na coluna correspondente ao tipo de serviço (ordenado por id do bairro)
-    No **atual_coluna = &(cidade->colunas[tipo]);
+        while (atual && atual->bairro->id < bairro->id) {
+            anterior = atual;
+            atual = atual->baixo;
+        }
 
-    while (*atual_coluna && (*atual_coluna)->bairro->id < bairro->id) {
-        atual_coluna = &((*atual_coluna)->baixo);
+        if (anterior == NULL) {
+            novo->baixo = cidade->colunas[tipo];
+            cidade->colunas[tipo] = novo;
+        } else {
+            novo->baixo = anterior->baixo;
+            anterior->baixo = novo;
+        }
     }
-
-    novo->baixo = *atual_coluna;
-    *atual_coluna = novo;
 }
 
 // Imprime todos os serviços organizados por bairro e por tipo
@@ -211,43 +235,3 @@ No* buscar_servico_por_nome(Cidade *cidade, const char *nome) {
 
     return NULL; // Não encontrado
 }
-
-
-// Exemplo de uso na simulação
-/*int main() {
-    Cidade cidade;
-    inicializar_cidade(&cidade);
-
-    // Criando alguns bairros (normalmente viriam da tabela hash)
-    Bairro centro = {0, "Centro", NULL};
-    Bairro jardim = {1, "Jardim das Flores", NULL};
-    Bairro nova = {2, "Vila Nova", NULL};
-    Bairro machadinho = {3, "Vila Machadinho", NULL};
-
-    // Criando serviços
-    bombeiros b1 = {1, "Quartel Central", NULL};
-    hospital h1 = {"Hospital Municipal", 1, NULL};
-    SAMU samu = {1, 2, 0, NULL};
-    policia p1 = {1, "DP Central", NULL};
-
-    // Registro de ocorrências no histórico
-    inicializar_historico(&samu.historico);
-    registrar_ocorrencia(&samu.historico, "09:00", "09:15", 2, AMBULANCIA, &centro);
-    registrar_ocorrencia(&samu.historico, "09:30", "09:45", 1, AMBULANCIA, &jardim);
-
-    // Inserção dos serviços na cidade
-    inserir_servico(&cidade, &centro, &b1, BOMBEIRO);
-    inserir_servico(&cidade, &centro, &h1, HOSPITAL);
-    inserir_servico(&cidade, &jardim, &p1, POLICIA);
-    inserir_servico(&cidade, &nova, &samu, AMBULANCIA);
-    inserir_servico(&cidade, &machadinho, &h1, HOSPITAL);
-    inserir_servico(&cidade, &machadinho, &samu, AMBULANCIA);
-    inserir_servico(&cidade, &machadinho, &b1, BOMBEIRO);
-
-    // Imprimindo a lista cruzada
-    imprimir_lista_cruzada(&cidade);
-    printf("\n");
-    imprimir_historico(&samu.historico);
-
-    return 0;
-}*/

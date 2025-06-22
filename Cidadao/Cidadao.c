@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include<stdlib.h>
+#include<string.h>
 #define MAXHASH 20
 #include"../constantes/constantes.h"
 

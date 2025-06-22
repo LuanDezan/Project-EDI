@@ -11,8 +11,8 @@
 #define TEMPO_TICK   10
 #define MAXHASH      20
 #define NUM_BAIRROS  4
-#define NUM_SERVICOS 3  // Apenas hospital, polícia e bombeiro
-#define TEMPO_TICK   10
+#define NUM_SERVICOS 3  //  hospital, polícia e bombeiro
+
 extern time_t tempoGlobal;
 extern const char *NOME_SERVICOS[];
 extern const int TEMPOS_ATENDIMENTO[];
@@ -92,15 +92,16 @@ typedef struct Ocorrencia {
 
     Tarefa* tarefas;            // Lista de tarefas necessárias
     char descricao[100];        // Descrição detalhada
-
+    int tarefas_pendentes;
     // Flags para serviços adicionais
     bool requer_hospital;
     bool requer_bombeiro;
     bool requer_policia;
     bool requer_ambulancia;
-
+     bool finalizada;
     struct Ocorrencia* prox;    // Próxima ocorrência na fila
 } Ocorrencia;
+
 
 typedef struct {
     Ocorrencia *ocorrencia;
@@ -127,10 +128,14 @@ typedef struct {
     int proximo_id;              // Auto-incremento para IDs
 } historicoOcorrencias;
 
+typedef struct NoFila {
+    Ocorrencia *ocorrencia;
+    struct NoFila *prox;
+} NoFila;
 
-typedef struct {
-    Ocorrencia *inicio;
-    Ocorrencia *fim;
+typedef struct DescritorFila {
+    NoFila *inicio;
+    NoFila *fim;
     int tamanho;
 } DescritorFila;
 
@@ -194,7 +199,11 @@ typedef struct {
 
 
 
-DescritorFila *filas[NUM_BAIRROS][NUM_SERVICOS];
+extern DescritorFila *filas[NUM_BAIRROS][NUM_SERVICOS];
+
+
+
+
 
 
 #endif // CONSTANTE

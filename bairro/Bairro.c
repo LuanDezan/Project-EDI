@@ -6,13 +6,13 @@
 #define MAXHASH 20
 #include<time.h>
 
-/*typedef struct Bairro{
+/* typedef struct Bairro{
     int id;
     char nomeDoBairro[30];
     struct Bairro *prox;
 }Bairro;
 
-/* Essa é uma alternativa, acredito que pior
+Essa é uma alternativa, acredito que pior
 int hashBairro(Bairro *teste){
     int chave = teste->id;
 
