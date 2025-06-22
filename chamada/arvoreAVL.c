@@ -15,6 +15,12 @@ void inicializarAVL(noAVL **raiz){
     *raiz = NULL;
 }
 
+// Função para gerar chave de ordenação única
+int gerarChave(Ocorrencia *oc) {
+    // Garante que IDs menores tenham prioridade quando gravidades forem iguais
+    return oc->gravidade * 1000000 + (1000000 - oc->id);
+}
+
 // Função recursiva que calcula a altura da árvore
 int altura(noAVL *arvore) {
     if (arvore == NULL)
@@ -47,12 +53,12 @@ void rotacionaEsq(noAVL **arvore) {
 
 // Função recursiva de inserção na AVL com balanceamento
 bool inserirRec(noAVL **arvore, Ocorrencia *ocorrencia) {
-    if (ocorrencia == NULL) return false;
+    if(ocorrencia == NULL) return false;
 
     int FB;
+    int chave = gerarChave(ocorrencia);
 
     if (*arvore == NULL) {
-        // Inserção direta quando encontra posição vazia
         noAVL *novo = (noAVL *)malloc(sizeof(noAVL));
         if (novo == NULL)
             return false;
@@ -60,23 +66,17 @@ bool inserirRec(noAVL **arvore, Ocorrencia *ocorrencia) {
         novo->esq = novo->dir = NULL;
         *arvore = novo;
     } else {
-        // Comparação principal: gravidade
-        if (ocorrencia->gravidade < (*arvore)->info->gravidade)
+        int chaveAtual = gerarChave((*arvore)->info);
+        if (chave < chaveAtual)
             inserirRec(&(*arvore)->esq, ocorrencia);
-        else if (ocorrencia->gravidade > (*arvore)->info->gravidade)
+        else if (chave > chaveAtual)
             inserirRec(&(*arvore)->dir, ocorrencia);
         else {
-            // Gravidade repetida: desempata usando o ID
-            if (ocorrencia->id < (*arvore)->info->id)
-                inserirRec(&(*arvore)->esq, ocorrencia);
-            else
-                inserirRec(&(*arvore)->dir, ocorrencia);
+            return 0;
         }
 
-        // Verificação de balanceamento após inserção
         FB = fatorBalanceamento(*arvore);
 
-        // Rotações necessárias para manter AVL balanceada
         if (FB >= 2) {
             if (fatorBalanceamento((*arvore)->dir) > 0)
                 rotacionaEsq(arvore);
@@ -105,33 +105,29 @@ noAVL* minimo(noAVL *arvore) {
 }
 
 // Função de remoção usando gravidade e ID como critério
-noAVL* removerRec(noAVL *arvore, int gravidade, int id) {
+noAVL* removerRec(noAVL *arvore, Ocorrencia *ocorrencia) {
     if (arvore == NULL)
         return NULL;
 
-    // Primeiro compara gravidade
-    if (gravidade < arvore->info->gravidade) {
-        arvore->esq = removerRec(arvore->esq, gravidade, id);
-    } else if (gravidade > arvore->info->gravidade) {
-        arvore->dir = removerRec(arvore->dir, gravidade, id);
+    // Gera a chave composta
+    int chaveRemover = gerarChave(ocorrencia);
+    int chaveAtual = gerarChave(arvore->info);
+
+    // Compara a atual com a que vai ser removida
+    if (chaveRemover < chaveAtual) {
+        arvore->esq = removerRec(arvore->esq, ocorrencia);
+    } else if (chaveRemover > chaveAtual) {
+        arvore->dir = removerRec(arvore->dir, ocorrencia);
     } else {
-        // Gravidade igual, desempata por ID
-        if (id < arvore->info->id) {
-            arvore->esq = removerRec(arvore->esq, gravidade, id);
-        } else if (id > arvore->info->id) {
-            arvore->dir = removerRec(arvore->dir, gravidade, id);
+        if (arvore->esq == NULL || arvore->dir == NULL) {
+            noAVL *temp = (arvore->esq != NULL) ? arvore->esq : arvore->dir;
+            free(arvore->info);
+            free(arvore);
+            return temp;
         } else {
-            // Nó encontrado para remoção
-            if (arvore->esq == NULL || arvore->dir == NULL) {
-                noAVL *temp = (arvore->esq != NULL) ? arvore->esq : arvore->dir;
-                free(arvore->info);
-                free(arvore);
-                return temp;
-            } else {
-                noAVL *temp = minimo(arvore->dir);
-                *(arvore->info) = *(temp->info);
-                arvore->dir = removerRec(arvore->dir, temp->info->gravidade, temp->info->id);
-            }
+            noAVL *temp = minimo(arvore->dir);
+            *(arvore->info) = *(temp->info);
+            arvore->dir = removerRec(arvore->dir, temp->info);
         }
     }
 
@@ -157,31 +153,13 @@ noAVL* removerRec(noAVL *arvore, int gravidade, int id) {
     return arvore;
 }
 
-// Função auxiliar recursiva para encontrar a próxima chamada
-// Ela percorre toda a árvore e atualiza o ponteiro "melhor" sempre que encontra uma ocorrência com gravidade maior, ou com mesmo nível de gravidade mas ID menor
-void buscarProxima(noAVL *arvore, Ocorrencia **melhor) {
-    if (arvore == NULL) return;
-
-    // Se ainda não há candidato ou encontramos uma ocorrência melhor:
-    // 1. Gravidade maior
-    // 2. Ou mesma gravidade mas ID menor (critério de desempate)
-    if (*melhor == NULL ||
-        arvore->info->gravidade > (*melhor)->gravidade ||
-        (arvore->info->gravidade == (*melhor)->gravidade && arvore->info->id < (*melhor)->id)) {
-        *melhor = arvore->info;
-    }
-
-    // Percorre recursivamente toda a árvore
-    buscarProxima(arvore->esq, melhor);
-    buscarProxima(arvore->dir, melhor);
-}
-
-// Função principal que retorna a próxima chamada
-// Inicia com ponteiro nulo e chama a função recursiva auxiliar
 Ocorrencia* proximaChamada(noAVL *arvore) {
-    Ocorrencia *melhor = NULL;
-    buscarProxima(arvore, &melhor);
-    return melhor;
+    if (arvore == NULL) return NULL;
+
+    noAVL *atual = arvore;
+    while (atual->dir != NULL)
+        atual = atual->dir;
+    return atual->info;
 }
 
 // Percorre em ordem (esquerda, raiz, direita) - mostra gravidades em ordem crescente
@@ -254,10 +232,16 @@ int main() {
     }
 
     printf("\nRemovendo ocorrencia atendida...\n");
-    raiz = removerRec(raiz, prox->gravidade, prox->id);
+    raiz = removerRec(raiz, prox);
 
     printf("\nChamadas em ordem de gravidade (In-Ordem) apos remocao:\n");
     inOrdem(raiz);
+
+    printf("\nProxima chamada a ser atendida:\n");
+    prox = proximaChamada(raiz);
+    if (prox != NULL) {
+        printf("ID: %d | Gravidade: %d\n", prox->id, prox->gravidade);
+    }
 
     // Exemplo de reiniciar a árvore
     printf("\nReiniciando arvore...\n");
