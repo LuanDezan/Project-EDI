@@ -32,6 +32,58 @@ bool servico_disponivel(Cidade *cidade, int id_bairro, TipoServico tipo) {
     return false;
 }
 
+
+hospital* criar_hospital(int id_bairro) {
+    hospital* h = (hospital*)malloc(sizeof(hospital));
+    if (!h) return NULL;
+    snprintf(h->nome, MAX, "Hospital do Bairro %d", id_bairro);
+    h->id = id_bairro;
+    h->historico.quantidade = 0;
+    h->historico.proximo_id = 0;
+    h->historico.topo = NULL;
+    h->prox = NULL;
+    return h;
+}
+
+policia* criar_policia(int id_bairro) {
+    policia* p = (policia*)malloc(sizeof(policia));
+    if (!p) return NULL;
+    snprintf(p->nome, MAX, "Delegacia do Bairro %d", id_bairro);
+    p->id = id_bairro;
+    p->historico.quantidade = 0;
+    p->historico.proximo_id = 0;
+    p->historico.topo = NULL;
+    p->prox = NULL;
+    return p;
+}
+
+bombeiros* criar_bombeiro(int id_bairro) {
+    bombeiros* b = (bombeiros*)malloc(sizeof(bombeiros));
+    if (!b) return NULL;
+    snprintf(b->nome, MAX, "Quartel do Bairro %d", id_bairro);
+    b->id = id_bairro;
+    b->localizacao = id_bairro;
+    b->historico.quantidade = 0;
+    b->historico.proximo_id = 0;
+    b->historico.topo = NULL;
+    b->prox = NULL;
+    return b;
+}
+
+SAMU* criar_ambulancia(int id_bairro) {
+    SAMU* s = (SAMU*)malloc(sizeof(SAMU));
+    if (!s) return NULL;
+    s->id = id_bairro;
+    s->prioridade = 0;
+    s->vazia = 1;
+    s->historico.quantidade = 0;
+    s->historico.proximo_id = 0;
+    s->historico.topo = NULL;
+    s->prox = NULL;
+    return s;
+}
+
+
 // Encontra o bairro mais próximo com um serviço específico
 Bairro* encontrar_bairro_com_servico(Cidade *cidade, float lat, float lon, TipoServico tipo, Bairro tabela[], int maxHash) {
     Bairro *melhor_bairro = NULL;
@@ -211,36 +263,31 @@ void atualizar_localizacao_cidadaos(Cidadao *tabelaHashCidadao[], int maxHash) {
 
 
 void criarServicosParaBairros(Cidade *cidade, Bairro tabelaHashBairro[], int maxHash) {
-    for(int hash_idx = 0; hash_idx < maxHash; hash_idx++) {
-        Bairro* b = tabelaHashBairro[hash_idx].prox;
-        while(b != NULL) {
-            // Serviços fixos (hospital e polícia em todos bairros)
-            hospital* hosp = malloc(sizeof(hospital));
-            hosp->id = b->id * 10 + HOSPITAL;
-            inserir_servico(cidade, b, hosp, HOSPITAL);
+    bool hasBombeiro = false;
+    bool hasAmbulancia = false;
 
-            policia* pol = malloc(sizeof(policia));
-            pol->id = b->id * 10 + POLICIA;
-            inserir_servico(cidade, b, pol, POLICIA);
+    for (int i = 1; i <= NUM_BAIRROS; i++) {
+        Bairro *bairro = buscar_bairro_por_id(tabelaHashBairro, i, maxHash);
+        if (!bairro) continue;
 
-            // Serviços aleatórios (bombeiro e ambulância - 50% chance cada)
-            if (rand() % 2 == 0) {
-                bombeiros* bmb = malloc(sizeof(bombeiros));
-                bmb->id = b->id * 10 + BOMBEIRO;
-                inserir_servico(cidade, b, bmb, BOMBEIRO);
-            }
+        // Serviços fixos em todos os bairros
+        inserir_servico(cidade, bairro, criar_hospital(i), HOSPITAL);
+        inserir_servico(cidade, bairro, criar_policia(i), POLICIA);
 
-            if (rand() % 2 == 0) {
-                SAMU* amb = malloc(sizeof(SAMU));
-                amb->id = b->id * 10 + AMBULANCIA;
-                inserir_servico(cidade, b, amb, AMBULANCIA);
-            }
+        // Serviços aleatórios (garante pelo menos um de cada na cidade)
+        bool addBombeiro = (i == 1) ? true : (rand() % 2 == 0);
+        bool addAmbulancia = (i == 1) ? true : (rand() % 2 == 0);
 
-            b = b->prox;
+        if (addBombeiro || !hasBombeiro) {
+            inserir_servico(cidade, bairro, criar_bombeiro(i), BOMBEIRO);
+            hasBombeiro = true;
+        }
+        if (addAmbulancia || !hasAmbulancia) {
+            inserir_servico(cidade, bairro, criar_ambulancia(i), AMBULANCIA);
+            hasAmbulancia = true;
         }
     }
 }
-
 
 
 

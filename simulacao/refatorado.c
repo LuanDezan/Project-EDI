@@ -160,7 +160,7 @@ void exibirCabecalho() {
     char horario_str[6];
     formatarHorario(tempoGlobal, horario_str);
 
-    printf("\n\n\n");
+    printf("\n\n\n\n\n\n");
     printf("╔════════════════════════════════════════════════════════════════════════════╗\n");
     printf("║ SISTEMA DE ATENDIMENTO DE EMERGENCIAS                                      ║\n");
     printf("╠════════════════════════════════════════════════════════════════════════════╣\n");
@@ -350,7 +350,7 @@ int gerarOcorrenciasIniciais(Cidade *cidade, Bairro bairros[], Cidadao *cidadaos
 
 void exibirEstadoInicialComAVL(noAVL *filas[NUM_BAIRROS][NUM_SERVICOS], Bairro tabelaHashBairro[]) {
      printf("\n\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    printf("                 <<< ESTADO INICIAL DAS FILAS DE ATENDIMENTO >>>                 \n");
+    printf("                 <<< ESTADO DAS FILAS DE ATENDIMENTO >>>                 \n");
     printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
 
@@ -592,6 +592,8 @@ void processarCicloAtendimento(Cidade *cidade, Bairro tabelaHashBairro[], Cidada
     formatarHorario(tempoGlobal, horario_str);
     exibirCabecalho();
         exibirFilasDeEspera(tabelaHashBairro);
+        printf("\n\n");
+        exibirCabecalho();
     printf("\n\n                           ══════════════════════════════\n");
     printf("                            CICLO DE ATENDIMENTO %s\n", horario_str);
     printf("                           ══════════════════════════════\n\n\n");
@@ -612,6 +614,9 @@ void processarCicloAtendimento(Cidade *cidade, Bairro tabelaHashBairro[], Cidada
             if (at->ocorrencia) {
                 at->tempo_restante -= TEMPO_TICK;
                 if (at->tempo_restante <= 0) {
+                                printf("[SERVIÇO CONCLUÍDO] %s para ocorrência %04d (Bairro: %s)\n",
+               NOME_SERVICOS[s], at->ocorrencia->id, bairro->nomeDoBairro);
+
                     Tarefa *t = at->ocorrencia->tarefas;
                     while (t) {
                         if (t->servico == s && !t->concluida) {
@@ -624,6 +629,8 @@ void processarCicloAtendimento(Cidade *cidade, Bairro tabelaHashBairro[], Cidada
                     }
 
                     if (at->ocorrencia->tarefas_pendentes == 0) {
+                             printf("[OCORRÊNCIA FINALIZADA] ID: %04d | Cidadão: %s\n",
+                   at->ocorrencia->id, at->ocorrencia->cidadao->nomeCidadao);
                         at->ocorrencia->finalizada = true;
                         registrar_ocorrencia(historico, at->ocorrencia, horario_str);
                         if (at->ocorrencia->cidadao) at->ocorrencia->cidadao->emOcorrencia = false;
@@ -649,14 +656,14 @@ void processarCicloAtendimento(Cidade *cidade, Bairro tabelaHashBairro[], Cidada
         }
     }
 
-    Ocorrencia *nova = criarOcorrenciaAleatoria(cidade, tabelaHashBairro, tabelaHashCidadao, true, MAXHASH);
-    if (nova) {
-        adicionarOcorrenciaNasArvores(nova);
+    int numOcorrencias = 2 + rand() % 2; // 2 ou 3
+    for (int i = 0; i < numOcorrencias; i++) {
+        Ocorrencia *nova = criarOcorrenciaAleatoria(cidade, tabelaHashBairro, tabelaHashCidadao, true, MAXHASH);
+        if (nova) adicionarOcorrenciaNasArvores(nova);
     }
 
     tempoGlobal += TEMPO_TICK;
 }
-
 
 
 
