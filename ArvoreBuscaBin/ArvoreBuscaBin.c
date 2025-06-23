@@ -1,11 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-typedef struct no{
-    Ocorrencia* elemento;
-    struct no* dir;
-    struct no* esq;
-}no;
+#include"../constantes/constantes.h"
+
 
 void inicializar(no **raiz){
     *raiz = NULL;
@@ -103,3 +100,7 @@ void reiniciarArvore(no **raiz){
         remover(raiz, (*raiz)->elemento->id);
     }
 }
+
+
+
+

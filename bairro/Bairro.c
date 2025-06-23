@@ -36,38 +36,38 @@ void inicializarTabelaBairro(Bairro *tabela){
 
 
 
-void cadastrarBairro(int id, const char *nome, Bairro tabela[]) {
-    int hash = id % MAXHASH;
-    Bairro *novo = malloc(sizeof(Bairro));
-    novo->id = id;
-    strcpy(novo->nomeDoBairro, nome);
+    void cadastrarBairro(int id, const char *nome, Bairro tabela[]) {
+        int hash = id % MAXHASH;
+        Bairro *novo = malloc(sizeof(Bairro));
+        novo->id = id;
+        strcpy(novo->nomeDoBairro, nome);
 
-    // Definir coordenadas baseadas no ID
-    switch(id) {
-        case 1: // Centro
-            novo->latitude = -22.9068;
-            novo->longitude = -43.1729;
-            break;
-        case 2: // Norte
-            novo->latitude = -22.8742;
-            novo->longitude = -43.2973;
-            break;
-        case 3: // Sul
-            novo->latitude = -22.9511;
-            novo->longitude = -43.2105;
-            break;
-        case 4: // Leste
-            novo->latitude = -22.8471;
-            novo->longitude = -43.0971;
-            break;
-        default: // Coordenadas padrão
-            novo->latitude = -22.9000 + (id-1)*0.01;
-            novo->longitude = -43.2000 + (id-1)*0.01;
+        // Definir coordenadas baseadas no ID
+        switch(id) {
+            case 1: // Centro
+                novo->latitude = -22.9068;
+                novo->longitude = -43.1729;
+                break;
+            case 2: // Norte
+                novo->latitude = -22.8742;
+                novo->longitude = -43.2973;
+                break;
+            case 3: // Sul
+                novo->latitude = -22.9511;
+                novo->longitude = -43.2105;
+                break;
+            case 4: // Leste
+                novo->latitude = -22.8471;
+                novo->longitude = -43.0971;
+                break;
+            default: // Coordenadas padrão
+                novo->latitude = -22.9000 + (id-1)*0.01;
+                novo->longitude = -43.2000 + (id-1)*0.01;
+        }
+
+        novo->prox = tabela[hash].prox;
+        tabela[hash].prox = novo;
     }
-
-    novo->prox = tabela[hash].prox;
-    tabela[hash].prox = novo;
-}
 
 
 void removerBairro(Bairro *tabela, int idBairro){ //Essa função me gerou uma dúvida, a gente mantêm os bairros usados em algum lugar fora da tabela hash tbm?

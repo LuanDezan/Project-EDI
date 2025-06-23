@@ -10,7 +10,6 @@
 
 #define MAXHASH 20
 #define NUM_BAIRROS 4
-#define NUM_SERVICOS 3
 #define TEMPO_TICK 10
 
 bool servico_disponivel(Cidade *cidade, int id_bairro, TipoServico tipo) {

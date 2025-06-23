@@ -129,11 +129,6 @@ typedef struct NoFila {
     struct NoFila *prox;
 } NoFila;
 
-typedef struct DescritorFila {
-    NoFila *inicio;
-    NoFila *fim;
-    int tamanho;
-} DescritorFila;
 
 typedef enum {
     BOMBEIRO,
@@ -187,8 +182,81 @@ typedef struct {
     No *colunas[MAX_SERVICOS];   // Cada coluna representa um tipo de serviço
 } Cidade;
 
-extern DescritorFila *filas[NUM_BAIRROS][NUM_SERVICOS];
 
 
 
+
+typedef struct noAVL {
+    Ocorrencia *info;
+    struct noAVL *esq, *dir;
+} noAVL;
+
+
+typedef struct no{
+    Ocorrencia* elemento;
+    struct no* dir;
+    struct no* esq;
+}no;
+
+// Descritor de fila com árvore AVL
+typedef struct DescritorFila {
+    noAVL *raiz;
+    int tamanho;
+} DescritorFila;
+
+
+// Protótipo das funções AVL
+int gerarChave(Ocorrencia *oc);
+int altura(noAVL *arvore);
+int fatorBalanceamento(noAVL *arvore);
+void rotacionaDir(noAVL **arvore);
+void rotacionaEsq(noAVL **arvore);
+bool inserirRec(noAVL **arvore, Ocorrencia *ocorrencia);
+noAVL* minimo(noAVL *arvore);
+void inOrdemDecrescente(noAVL *arvore);
+void inicializarAVL(noAVL **arvore);
+Ocorrencia* proximaChamada(noAVL *arvore);
+noAVL* removerRec(noAVL *arvore, Ocorrencia *ocorrencia);
+
+// Protótipo das funções BST
+void inicializar(no **raiz);
+void inserir(no **raiz, Ocorrencia *nova);
+no* buscar(no **raiz, int idBuscado);
+Ocorrencia* remover(no **raiz, int idRemocao);
+void reiniciarArvore(no **raiz);
+
+// Protótipo de funções auxiliares
+void obterServicosStr(Ocorrencia *oc, char *saida);
+Bairro* buscar_bairro_por_id(Bairro tabela[], int idBairro, int maxHash);
+bool servico_disponivel(Cidade *cidade, int id_bairro, TipoServico tipo);
+Bairro* encontrar_bairro_com_servico(Cidade *cidade, float lat, float lon, TipoServico tipo, Bairro tabela[], int maxHash);
+Bairro* encontrar_bairro_mais_proximo(float lat, float lon, Bairro tabela[], int maxHash);
+Cidadao* selecionar_cidadao_aleatorio(Cidadao *tabelaHashCidadao[], int maxHash);
+void liberarArvoreAVL(noAVL **arvore);
+void cadastrarBairro(int id, const char *nome, Bairro tabelaHash[]);
+extern noAVL *arvoreAVL[NUM_BAIRROS][NUM_SERVICOS];
+extern no *arvoreBST;
+
+void inicializarCidade(Cidade *cidade, Bairro tabelaHashBairro[], int maxHash);
+void criarServicosParaBairros(Cidade *cidade, Bairro tabelaHashBairro[], int maxHash);
+
+// inicialização e liberação das árvores globais
+void inicializarArvores(void);
+
+ void gerarCidadaosAleatorios(Cidadao *tabelaHashCidadao[],
+                              Bairro tabelaHashBairro[],
+                              int maxHash);
+
+// exibição inicial usando AVL
+void exibirEstadoInicialComAVL(noAVL *filas[NUM_BAIRROS][NUM_SERVICOS],
+                               Bairro tabelaHashBairro[]);
+
+// geração de ocorrências iniciais
+int gerarOcorrenciasIniciais(Cidade *cidade, Bairro bairros[],
+                             Cidadao *cidadaos[], int maxHash);
+
+// processamento de cada ciclo
+void processarCicloAtendimento(Cidade *cidade,
+    Bairro tabelaHashBairro[], Cidadao *tabelaHashCidadao[],
+    historicoOcorrencias *historico);
 #endif // CONSTANTE

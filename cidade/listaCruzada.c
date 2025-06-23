@@ -7,7 +7,7 @@
 
 // Constantes para limites máximos
 #define MAX_BAIRROS 4
-#define MAX_SERVICOS 3  // Bombeiro, Hospital, Polícia
+
 #define MAX_HISTORICO 100
 
 //sistema cidade, ligando bairros a serviços

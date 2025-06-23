@@ -31,6 +31,9 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="ArvoreBuscaBin/ArvoreBuscaBin.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Cidadao/Cidadao.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -50,12 +53,15 @@
 		<Unit filename="bombeiro/bombeiro.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="chamada/arvoreAVL.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="chamada/arvoreAVL.h" />
 		<Unit filename="cidade/listaCruzada.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="constantes/constantes.h" />
 		<Unit filename="constantes/simulacao.h" />
-		<Unit filename="constantes/sistemaEmergencia.h" />
 		<Unit filename="hash/hash.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -78,6 +84,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="simulacao/ocorrencia.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="simulacao/refatorado.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="simulacao/simulacao.c">

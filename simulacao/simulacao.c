@@ -1,4 +1,4 @@
-#include <stdio.h>
+/*#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -751,3 +751,4 @@ void processarCicloAtendimento(DescritorFila *filas[][NUM_SERVICOS],
     // 7. Avançar o tempo global
     tempoGlobal += TEMPO_TICK;
 }
+*/

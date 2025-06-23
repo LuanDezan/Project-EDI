@@ -112,3 +112,150 @@
 	<conio.h>
 	<stdio.h>
 
+1750649380 source:d:\mandartudolinux\ed1\bomba\project-edi\bairro\bairro.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../constantes/constantes.h"
+	<time.h>
+
+1750649617 d:\mandartudolinux\ed1\bomba\project-edi\constantes\constantes.h
+	<stdbool.h>
+	<time.h>
+
+1750488957 source:d:\mandartudolinux\ed1\bomba\project-edi\bombeiro\bombeiro.c
+	"../constantes/constantes.h"
+
+1750635975 source:d:\mandartudolinux\ed1\bomba\project-edi\cidadao\cidadao.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../constantes/constantes.h"
+
+1750649710 source:d:\mandartudolinux\ed1\bomba\project-edi\cidade\listacruzada.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../bairro/Bairro.h"
+	"../constantes/constantes.h"
+
+1750488977 d:\mandartudolinux\ed1\bomba\project-edi\bairro\bairro.h
+
+1750488962 source:d:\mandartudolinux\ed1\bomba\project-edi\hash\hash.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../bombeiro/bombeiro.c"
+	"../constantes/constantes.h"
+
+1750488957 d:\mandartudolinux\ed1\bomba\project-edi\bombeiro\bombeiro.c
+	"../constantes/constantes.h"
+
+1750649841 source:d:\mandartudolinux\ed1\bomba\project-edi\historico\historico.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdbool.h>
+	"../constantes/constantes.h"
+
+1749944030 source:d:\mandartudolinux\ed1\bomba\project-edi\hospital\hospital.c
+
+1750489008 source:d:\mandartudolinux\ed1\bomba\project-edi\hospital\hospitalcomhash.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1750488616 source:d:\mandartudolinux\ed1\bomba\project-edi\main\main - copia.c
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<locale.h>
+	"..\constantes\constantes.h"
+
+1750656789 source:d:\mandartudolinux\ed1\bomba\project-edi\main\main.c
+	<windows.h>
+	<locale.h>
+	"../constantes/constantes.h"
+	<locale.h>
+	"../constantes/simulacao.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<stdbool.h>
+	<conio.h>
+	<stdio.h>
+
+1750649495 d:\mandartudolinux\ed1\bomba\project-edi\constantes\simulacao.h
+	"constantes.h"
+
+1750488937 source:d:\mandartudolinux\ed1\bomba\project-edi\policia\policia.c
+
+1750488994 source:d:\mandartudolinux\ed1\bomba\project-edi\policia\policiacomhash.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1750488986 source:d:\mandartudolinux\ed1\bomba\project-edi\samu\samu.c
+	<stdio.h>
+	<stdlib.h>
+
+1750649710 source:d:\mandartudolinux\ed1\bomba\project-edi\simulacao\geo.c
+	<float.h>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<stdbool.h>
+	"../constantes/constantes.h"
+	"../constantes/simulacao.h"
+
+1749944199 source:d:\mandartudolinux\ed1\bomba\project-edi\simulacao\ocorrencia.c
+
+1750640636 source:d:\mandartudolinux\ed1\bomba\project-edi\simulacao\simulacao.c
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<stdbool.h>
+	<math.h>
+	<locale.h>
+	<unistd.h>
+	"../constantes/constantes.h"
+	"../constantes/simulacao.h"
+	"../constantes/sistemaEmergencia.h"
+
+1750649569 d:\mandartudolinux\ed1\bomba\project-edi\constantes\sistemaemergencia.h
+
+1750656697 source:d:\mandartudolinux\ed1\bomba\project-edi\simulacao\refatorado.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<stdbool.h>
+	<math.h>
+	<locale.h>
+	<unistd.h>
+	"../constantes/constantes.h"
+	"../constantes/simulacao.h"
+	"../constantes/sistemaEmergencia.h"
+
+1750648164 source:d:\mandartudolinux\ed1\bomba\project-edi\arvorebuscabin\arvorebuscabin.c
+	<stdio.h>
+	<stdlib.h>
+	"../constantes/constantes.h"
+
+1750645886 source:d:\mandartudolinux\ed1\bomba\project-edi\arvorebuscabin\binario.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdbool.h>
+	"../constantes/constantes.h"
+
+1750652059 source:d:\mandartudolinux\ed1\bomba\project-edi\chamada\arvoreavl.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdbool.h>
+	"../constantes/constantes.h"
+

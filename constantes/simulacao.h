@@ -2,18 +2,13 @@
 #ifndef SIMULACAO_H
 #define SIMULACAO_H
 
+
+#include "constantes.h"
 void adicionarTarefa(Ocorrencia* oc, int servico);
 void marcarTarefaConcluida(Ocorrencia* oc, int servico, const char* horario);
 bool todasTarefasConcluidas(const Ocorrencia* oc);
 void exibirEstadoPosCiclo(DescritorFila *filas[][NUM_SERVICOS], Bairro tabelaHashBairro[]);
-
-
-void cadastrarBairro();
-void inicializarCidade();
-void criarServicosParaBairros();
-void verificarConexoes();
-void gerarCidadaosAleatorios();
-void processarFilas();
+void cadastrarBairro(int id, const char *nome, Bairro tabelaHash[]);
 
 Cidadao* selecionar_cidadao_aleatorio(Cidadao *tabelaHashCidadao[], int maxHash);
 
@@ -35,7 +30,7 @@ void filaAtendimento(DescritorFila *fila, Ocorrencia *oc);
 
 
 Bairro* buscar_bairro_por_id(Bairro tabela[], int idBairro, int maxHash);
-;
+
 
 // Adicione estes protótipos para o histórico
 void inicializar_historico(historicoOcorrencias *h);
@@ -46,8 +41,6 @@ void imprimir_detalhes_ocorrencia(Ocorrencia *oc);
 void destruir_historico(historicoOcorrencias *h);
 
 // Protótipos atualizados com histórico
-int gerarOcorrenciasIniciais(Cidade *cidade, Bairro bairros[], Cidadao *cidadaos[], DescritorFila *filas[][NUM_SERVICOS], int maxHash);
-void processarCicloAtendimento(DescritorFila *filas[][NUM_SERVICOS], Cidade *cidade, Bairro tabelaHashBairro[], Cidadao *tabelaHashCidadao[], historicoOcorrencias *historico);
 float calcular_distancia(float lat1, float lon1, float lat2, float lon2);
 
 void exibirOcorrenciaDetalhada(Ocorrencia* oc);
@@ -67,9 +60,32 @@ void destruir_cidade(Cidade *cidade);
 No* buscar_servico(Cidade *cidade, int id_bairro, TipoServico tipo);
 No* buscar_servico_por_nome(Cidade *cidade, const char *nome);
 
+void exibirEstadoInicialComAVL(noAVL *filas[NUM_BAIRROS][NUM_SERVICOS], Bairro tabelaHashBairro[]) ;
+int gerarOcorrenciasIniciais(Cidade *cidade, Bairro bairros[], Cidadao *cidadaos[], int maxHash);
+void processarCicloAtendimento(Cidade *cidade, Bairro tabelaHashBairro[], Cidadao *tabelaHashCidadao[], historicoOcorrencias *historico);
 
 
 
+bool inserirRec(noAVL **arvore, Ocorrencia *ocorrencia);
+noAVL* removerRec(noAVL *arvore, Ocorrencia *ocorrencia);
+Ocorrencia* proximaChamada(noAVL *arvore);
+void inicializarAVL(noAVL **arvore);
+void liberarArvoreAVL(noAVL **arvore);
+int gerarChave(Ocorrencia *oc);
+int altura(noAVL *arvore);
+int fatorBalanceamento(noAVL *arvore);
+void rotacionaDir(noAVL **arvore);
+void rotacionaEsq(noAVL **arvore);
+noAVL* minimo(noAVL *arvore);
+void inOrdemDecrescente(noAVL *arvore);
+
+
+void inicializar(no **raiz);
+void inserir(no **raiz, Ocorrencia *nova);
+Ocorrencia* remover(no **raiz, int idRemocao);
+no* buscar(no **raiz, int idBuscado);
+void reiniciarArvore(no **raiz);
+void liberarArvoreBST(no **raiz);
 #endif // SIMULACAO_H
 
 

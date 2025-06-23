@@ -117,14 +117,14 @@ void imprimir_historico(const historicoOcorrencias* h) {
     printf("---------------------------------------------------------\n");
 
     Ocorrencia* atual = h->topo;
-    while(atual) {
-        printf("%-5d | %-15s | %-8s | %-11s | %-8d \n",
-               atual->id,
-               atual->bairro->nomeDoBairro,
-               atual->horarioChegada,
-               atual->horarioAtendimento,
-               atual->gravidade,
-               atual->descricao);
+while (atual) {
+    printf("%-5d | %-15s | %-8s | %-11s | %-8d | %s\n",
+           atual->id,
+           atual->bairro->nomeDoBairro,
+           atual->horarioChegada,
+           atual->horarioAtendimento,
+           atual->gravidade,
+           atual->descricao);
         atual = atual->prox;
     }
     printf("===========================================================\n");
